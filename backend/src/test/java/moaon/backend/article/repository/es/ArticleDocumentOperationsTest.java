@@ -7,8 +7,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import moaon.backend.article.application.dto.ArticleQueryCondition;
 import moaon.backend.article.domain.ArticleDocument;
-import moaon.backend.article.dto.ArticleQueryCondition;
 import moaon.backend.fixture.ArticleFixtureBuilder;
 import moaon.backend.fixture.ArticleQueryConditionBuilder;
 import org.junit.jupiter.api.DisplayName;

@@ -7,8 +7,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import moaon.backend.article.application.dto.ArticleQueryCondition;
 import moaon.backend.article.domain.ArticleDocument;
-import moaon.backend.article.dto.ArticleQueryCondition;
 import moaon.backend.article.repository.ArticleSearchResult;
 import moaon.backend.article.repository.db.ArticleDBRepository;
 import moaon.backend.fixture.ArticleFixtureBuilder;

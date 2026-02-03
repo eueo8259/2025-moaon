@@ -2,15 +2,15 @@ package moaon.backend.article.repository.db;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import moaon.backend.article.dao.ArticleDao;
 import moaon.backend.article.domain.Article;
 import moaon.backend.article.domain.Sector;
+import moaon.backend.article.infrastructure.dao.ArticleDao;
 import moaon.backend.fixture.ArticleFixtureBuilder;
 import moaon.backend.fixture.ProjectFixtureBuilder;
 import moaon.backend.fixture.RepositoryHelper;
 import moaon.backend.global.config.QueryDslConfig;
-import moaon.backend.project.dao.ProjectDao;
 import moaon.backend.project.domain.Project;
+import moaon.backend.project.infrastructure.dao.ProjectDao;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

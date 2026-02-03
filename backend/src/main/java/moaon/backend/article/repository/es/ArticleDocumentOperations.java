@@ -2,8 +2,8 @@ package moaon.backend.article.repository.es;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import moaon.backend.article.application.dto.ArticleQueryCondition;
 import moaon.backend.article.domain.ArticleDocument;
-import moaon.backend.article.dto.ArticleQueryCondition;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.RefreshPolicy;

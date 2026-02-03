@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import moaon.backend.article.dao.ArticleDao;
+import moaon.backend.article.application.dto.ArticleQueryCondition;
 import moaon.backend.article.domain.Article;
 import moaon.backend.article.domain.Sector;
 import moaon.backend.article.domain.Topic;
-import moaon.backend.article.dto.ArticleQueryCondition;
+import moaon.backend.article.infrastructure.dao.ArticleDao;
 import moaon.backend.global.domain.SearchKeyword;
-import moaon.backend.project.dto.ProjectArticleQueryCondition;
+import moaon.backend.project.application.dto.ProjectArticleQueryCondition;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 

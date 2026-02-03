@@ -3,10 +3,11 @@ package moaon.backend.project.dto;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import moaon.backend.article.application.dto.ArticleQueryCondition;
 import moaon.backend.article.domain.ArticleSortType;
 import moaon.backend.article.domain.Sector;
-import moaon.backend.article.dto.ArticleQueryCondition;
 import moaon.backend.global.domain.SearchKeyword;
+import moaon.backend.project.application.dto.ProjectArticleQueryCondition;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

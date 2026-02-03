@@ -5,8 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import moaon.backend.global.cursor.Cursor;
 import moaon.backend.global.domain.SearchKeyword;
+import moaon.backend.project.application.dto.ProjectQueryCondition;
 import moaon.backend.project.domain.ProjectSortType;
-import moaon.backend.project.dto.ProjectQueryCondition;
 
 public class ProjectQueryConditionFixtureBuilder {
 

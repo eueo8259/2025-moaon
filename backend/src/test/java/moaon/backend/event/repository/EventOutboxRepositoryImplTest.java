@@ -6,12 +6,12 @@ import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORT
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import moaon.backend.article.dao.ArticleDao;
+import moaon.backend.article.infrastructure.dao.ArticleDao;
 import moaon.backend.event.domain.EventAction;
 import moaon.backend.event.domain.EventOutbox;
 import moaon.backend.event.domain.EventStatus;
 import moaon.backend.global.config.QueryDslConfig;
-import moaon.backend.project.dao.ProjectDao;
+import moaon.backend.project.infrastructure.dao.ProjectDao;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ class EventOutboxRepositoryImplTest {
     @DisplayName("특정 상태(PENDING)의 이벤트 목록을 오래된 순으로 N개 조회한다")
     void findEventsByStatus() {
         // given
-        EventOutbox pendingEvent1 =  eventOutboxRepository.save(EventOutbox.builder()
+        EventOutbox pendingEvent1 = eventOutboxRepository.save(EventOutbox.builder()
                 .entityId(1L)
                 .eventType("articles")
                 .action(EventAction.INSERT)
@@ -39,7 +39,7 @@ class EventOutboxRepositoryImplTest {
                 .createdAt(LocalDateTime.now())
                 .build());
 
-        EventOutbox pendingEvent2 =  eventOutboxRepository.save(EventOutbox.builder()
+        EventOutbox pendingEvent2 = eventOutboxRepository.save(EventOutbox.builder()
                 .entityId(2L)
                 .eventType("articles")
                 .action(EventAction.INSERT)
@@ -61,7 +61,7 @@ class EventOutboxRepositoryImplTest {
     @DisplayName("ID 목록을 받아 상태를 PROCESSED로 변경한다")
     void markAsProcessed() {
         // given
-        EventOutbox event1 =  eventOutboxRepository.save(EventOutbox.builder()
+        EventOutbox event1 = eventOutboxRepository.save(EventOutbox.builder()
                 .entityId(1L)
                 .eventType("articles")
                 .action(EventAction.INSERT)
@@ -69,7 +69,7 @@ class EventOutboxRepositoryImplTest {
                 .createdAt(LocalDateTime.now())
                 .build());
 
-        EventOutbox event2 =  eventOutboxRepository.save(EventOutbox.builder()
+        EventOutbox event2 = eventOutboxRepository.save(EventOutbox.builder()
                 .entityId(2L)
                 .eventType("articles")
                 .action(EventAction.INSERT)
@@ -90,7 +90,7 @@ class EventOutboxRepositoryImplTest {
     @DisplayName("ID 목록을 받아 실패 횟수를 1 증가시키고, 변경된 엔티티를 반환한다")
     void incrementFailCount() {
         // given
-        EventOutbox event =  eventOutboxRepository.save(EventOutbox.builder()
+        EventOutbox event = eventOutboxRepository.save(EventOutbox.builder()
                 .entityId(1L)
                 .eventType("articles")
                 .action(EventAction.INSERT)
@@ -111,7 +111,7 @@ class EventOutboxRepositoryImplTest {
     @DisplayName("ID 목록을 받아 상태를 FAILED로 변경하고, 변경된 엔티티를 반환한다")
     void markAsFailed() {
         // given
-        EventOutbox event =  eventOutboxRepository.save(EventOutbox.builder()
+        EventOutbox event = eventOutboxRepository.save(EventOutbox.builder()
                 .entityId(1L)
                 .eventType("articles")
                 .action(EventAction.INSERT)

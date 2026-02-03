@@ -3,6 +3,8 @@ package moaon.backend.article.dto;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import moaon.backend.article.application.dto.ArticleQueryCondition;
+import moaon.backend.article.application.dto.ArticleSearchRequest;
 import moaon.backend.article.domain.ArticleCursor;
 import moaon.backend.article.domain.ArticleSortType;
 import moaon.backend.article.domain.Sector;

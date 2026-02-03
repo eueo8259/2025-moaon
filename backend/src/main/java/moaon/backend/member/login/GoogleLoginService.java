@@ -2,9 +2,9 @@ package moaon.backend.member.login;
 
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import moaon.backend.member.application.JwtTokenService;
 import moaon.backend.member.domain.Member;
 import moaon.backend.member.repository.MemberRepository;
-import moaon.backend.member.service.JwtTokenService;
 import org.springframework.stereotype.Service;
 
 @Service

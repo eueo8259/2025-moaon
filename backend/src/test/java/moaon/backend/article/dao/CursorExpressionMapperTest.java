@@ -6,6 +6,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import java.time.LocalDateTime;
 import moaon.backend.article.domain.ArticleCursor;
 import moaon.backend.article.domain.ArticleSortType;
+import moaon.backend.article.infrastructure.dao.CursorExpressionMapper;
 import moaon.backend.article.repository.db.ArticleFullTextSearchHQLFunction;
 import moaon.backend.global.domain.SearchKeyword;
 import org.junit.jupiter.api.DisplayName;

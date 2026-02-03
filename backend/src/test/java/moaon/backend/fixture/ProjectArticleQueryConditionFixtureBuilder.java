@@ -2,7 +2,7 @@ package moaon.backend.fixture;
 
 import moaon.backend.article.domain.Sector;
 import moaon.backend.global.domain.SearchKeyword;
-import moaon.backend.project.dto.ProjectArticleQueryCondition;
+import moaon.backend.project.application.dto.ProjectArticleQueryCondition;
 
 public class ProjectArticleQueryConditionFixtureBuilder {
 
