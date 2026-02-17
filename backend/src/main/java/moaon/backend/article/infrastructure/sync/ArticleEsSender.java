@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import moaon.backend.event.domain.EventOutbox;
+import moaon.backend.article.event.domain.EventOutbox;
 import org.springframework.stereotype.Component;
 
 @Slf4j

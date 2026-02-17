@@ -3,14 +3,14 @@ package moaon.backend.event;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
 
 import java.time.LocalDateTime;
-import moaon.backend.event.domain.EventStatus;
-import moaon.backend.event.repository.EventOutboxRepository;
-import org.junit.jupiter.api.Disabled;
+import moaon.backend.article.event.EventOutboxCleaner;
+import moaon.backend.article.event.domain.EventStatus;
+import moaon.backend.article.event.repository.EventOutboxRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

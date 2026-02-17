@@ -1,8 +1,8 @@
-package moaon.backend.event.repository;
+package moaon.backend.article.event.repository;
 
 import java.util.List;
-import moaon.backend.event.domain.EventOutbox;
-import moaon.backend.event.domain.EventStatus;
+import moaon.backend.article.event.domain.EventOutbox;
+import moaon.backend.article.event.domain.EventStatus;
 
 public interface EventOutboxRepositoryCustom {
 

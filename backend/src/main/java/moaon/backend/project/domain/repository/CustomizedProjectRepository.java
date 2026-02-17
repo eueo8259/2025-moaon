@@ -13,6 +13,8 @@ public interface CustomizedProjectRepository {
 
     Project findProjectWithMemberJoin(Long id);
 
+    void increaseViewCountById(Long id);
+
     List<ProjectCategory> findProjectCategoriesByProjectId(Long id);
 
     List<ProjectTechStack> findProjectTechStacksByProjectId(Long id);

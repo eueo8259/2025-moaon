@@ -1,13 +1,13 @@
-package moaon.backend.event.repository;
+package moaon.backend.article.event.repository;
 
-import static moaon.backend.event.domain.QEventOutbox.eventOutbox;
+import static moaon.backend.article.event.domain.QEventOutbox.eventOutbox;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import moaon.backend.event.domain.EventOutbox;
-import moaon.backend.event.domain.EventStatus;
+import moaon.backend.article.event.domain.EventOutbox;
+import moaon.backend.article.event.domain.EventStatus;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 

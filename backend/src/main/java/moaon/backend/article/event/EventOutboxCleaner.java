@@ -1,10 +1,10 @@
-package moaon.backend.event;
+package moaon.backend.article.event;
 
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import moaon.backend.event.domain.EventStatus;
-import moaon.backend.event.repository.EventOutboxRepository;
+import moaon.backend.article.event.domain.EventStatus;
+import moaon.backend.article.event.repository.EventOutboxRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;

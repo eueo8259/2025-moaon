@@ -1,4 +1,4 @@
-package moaon.backend.event.domain;
+package moaon.backend.article.event.domain;
 
 public enum EventAction {
     INSERT,

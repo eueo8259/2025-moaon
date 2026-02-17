@@ -1,4 +1,4 @@
-package moaon.backend.event.domain;
+package moaon.backend.article.event.domain;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -61,7 +61,7 @@ public class EventOutbox {
     @Column
     private LocalDateTime processedAt;
 
-    public boolean isUpsert(){
+    public boolean isUpsert() {
         return action == EventAction.INSERT || action == EventAction.UPDATED;
     }
 

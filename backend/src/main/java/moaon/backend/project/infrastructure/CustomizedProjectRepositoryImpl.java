@@ -58,6 +58,11 @@ public class CustomizedProjectRepositoryImpl implements CustomizedProjectReposit
                 .orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NOT_FOUND));
     }
 
+    @Override
+    public void increaseViewCountById(Long id) {
+        projectDao.increaseViewCountById(id);
+    }
+
     private FilteringIds applyTechStacks(FilteringIds filteringIds, List<String> techStack) {
         if (filteringIds.hasEmptyResult() || CollectionUtils.isEmpty(techStack)) {
             return filteringIds;

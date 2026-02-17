@@ -6,10 +6,11 @@ import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORT
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import moaon.backend.article.event.domain.EventAction;
+import moaon.backend.article.event.domain.EventOutbox;
+import moaon.backend.article.event.domain.EventStatus;
+import moaon.backend.article.event.repository.EventOutboxRepository;
 import moaon.backend.article.infrastructure.dao.ArticleDao;
-import moaon.backend.event.domain.EventAction;
-import moaon.backend.event.domain.EventOutbox;
-import moaon.backend.event.domain.EventStatus;
 import moaon.backend.global.config.QueryDslConfig;
 import moaon.backend.project.infrastructure.dao.ProjectDao;
 import org.junit.jupiter.api.DisplayName;
