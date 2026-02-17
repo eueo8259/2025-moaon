@@ -62,8 +62,8 @@ public class ProjectService {
 
     @Transactional
     public ProjectDetailResponse increaseViewsCount(long id) {
+        projectRepository.increaseViewCountById(id);
         Project project = projectRepository.findProjectWithMemberJoin(id);
-        project.addViewCount();
         List<ProjectTechStack> stacks = projectRepository.findProjectTechStacksByProjectId(id);
         List<ProjectCategory> categories = projectRepository.findProjectCategoriesByProjectId(id);
 

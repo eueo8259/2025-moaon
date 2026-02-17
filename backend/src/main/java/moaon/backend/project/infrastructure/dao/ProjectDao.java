@@ -126,6 +126,15 @@ public class ProjectDao {
                 .fetch());
     }
 
+    public void increaseViewCountById(Long id) {
+        jpaQueryFactory
+                .update(project)
+                .set(project.views, project.views.add(1))
+                .where(project.id.eq(id))
+                .execute();
+    }
+
+
     public long count() {
         return Optional.ofNullable(jpaQueryFactory.select(Wildcard.count)
                 .from(project)
