@@ -66,9 +66,7 @@ public class ArticleService {
                     () -> new CustomException(ErrorCode.PROJECT_NOT_FOUND)
             );
 
-            if (!member.equals(project.getAuthor())) {
-                throw new CustomException(ErrorCode.UNAUTHORIZED_MEMBER);
-            }
+            project.validateAuthor(member);
 
             Article article = new Article(
                     request.title(),

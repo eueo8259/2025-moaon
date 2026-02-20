@@ -159,6 +159,12 @@ public class Project extends BaseTimeEntity {
         this.createdAt = createdAt;
     }
 
+    public void validateAuthor(Member member) {
+        if (!this.author.equals(member)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_MEMBER);
+        }
+    }
+
 
     public void addViewCount() {
         views++;
