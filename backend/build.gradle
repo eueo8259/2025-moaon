@@ -49,6 +49,10 @@ dependencies {
     testImplementation 'io.rest-assured:rest-assured'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+    //ShedLock
+    implementation 'net.javacrumbs.shedlock:shedlock-spring:5.13.0'
+    implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:5.13.0'
+
     // QueryDSL
     implementation "io.github.openfeign.querydsl:querydsl-jpa:7.0"
     annotationProcessor "io.github.openfeign.querydsl:querydsl-apt:7.0:jpa"
