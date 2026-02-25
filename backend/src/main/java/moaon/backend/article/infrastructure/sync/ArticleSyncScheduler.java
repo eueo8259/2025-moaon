@@ -13,6 +13,7 @@ import moaon.backend.article.event.domain.EventOutbox;
 import moaon.backend.article.event.domain.EventStatus;
 import moaon.backend.article.event.repository.EventOutboxRepository;
 import moaon.backend.global.exception.custom.CustomException;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,11 @@ public class ArticleSyncScheduler {
     private static final int MAX_RETRIES = 5;
 
     @Scheduled(fixedDelay = 2000)
+    @SchedulerLock(
+            name = "article_outbox_scheduler",
+            lockAtMostFor = "10s",
+            lockAtLeastFor = "2s"
+    )
     @Transactional
     public void pollAndProcessEvents() {
         try {

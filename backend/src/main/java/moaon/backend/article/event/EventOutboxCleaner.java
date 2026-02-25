@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import moaon.backend.article.event.domain.EventStatus;
 import moaon.backend.article.event.repository.EventOutboxRepository;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,11 @@ public class EventOutboxCleaner {
 
 
     @Scheduled(cron = "0 0 3 * * *") // 매일 새벽 3시
+    @SchedulerLock(
+            name = "article_outbox_scheduler",
+            lockAtMostFor = "10s",
+            lockAtLeastFor = "2s"
+    )
     @Transactional
     public void cleanupOldEvents() {
         int retentionDays = 7;
