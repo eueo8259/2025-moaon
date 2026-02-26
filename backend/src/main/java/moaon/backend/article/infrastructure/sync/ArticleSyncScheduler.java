@@ -33,7 +33,7 @@ public class ArticleSyncScheduler {
     @Scheduled(fixedDelay = 2000)
     @SchedulerLock(
             name = "article_outbox_scheduler",
-            lockAtMostFor = "10s",
+            lockAtMostFor = "1m",
             lockAtLeastFor = "2s"
     )
     @Transactional
