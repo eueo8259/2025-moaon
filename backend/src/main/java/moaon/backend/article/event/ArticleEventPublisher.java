@@ -23,10 +23,6 @@ public class ArticleEventPublisher {
         publish(article, EventAction.INSERT);
     }
 
-    public void publishUpdate(Article article) {
-        publish(article, EventAction.UPDATED);
-    }
-
     private void publish(Article article, EventAction action) {
         ArticleDocument document = new ArticleDocument(article);
         String payload = convertToJson(document);  // 변환 책임을 Publisher가 가짐

@@ -55,11 +55,7 @@ public class ArticleService {
 
     @Transactional
     public void increaseClicksCount(long id) {
-        Article article = articleRepositoryFacade.findById(id)
-                .orElseThrow(() -> new CustomException(ErrorCode.ARTICLE_NOT_FOUND));
-        article.addClickCount();
-        articleRepositoryFacade.updateClicksCount(article);
-        articleEventPublisher.publishUpdate(article);  // 이벤트 발행 명시적으로
+        articleRepositoryFacade.incrementClickCount(id);
     }
 
     @Transactional

@@ -9,8 +9,6 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import moaon.backend.article.application.dto.ArticleQueryCondition;
 import moaon.backend.article.domain.ArticleDocument;
-import moaon.backend.article.repository.ArticleSearchResult;
-import moaon.backend.article.repository.db.ArticleDBRepository;
 import moaon.backend.fixture.ArticleFixtureBuilder;
 import moaon.backend.fixture.ArticleQueryConditionBuilder;
 import moaon.backend.project.domain.Project;
@@ -22,27 +20,26 @@ import org.springframework.data.elasticsearch.core.SearchHits;
 class ArticleDocumentRepositoryTest {
 
     private final ArticleDocumentOperations documentOperations = Mockito.mock(ArticleDocumentOperations.class);
-    private final ArticleDBRepository databaseRepository = Mockito.mock(ArticleDBRepository.class);
-    private final ArticleDocumentRepository service = new ArticleDocumentRepository(documentOperations,
-            databaseRepository);
+    private final ArticleDocumentRepository repository = new ArticleDocumentRepository(documentOperations);
 
     private final ArticleQueryCondition queryCondition = new ArticleQueryConditionBuilder().sortBy(CREATED_AT).build();
 
-    @DisplayName("검색 요청 시 Elasticsearch에서 결과를 가져와 ArticleSearchResult로 감싼다.")
+    @DisplayName("검색 요청을 DocumentOperations에 위임하고 SearchHits를 반환한다.")
     @Test
     void search() {
         // given
-        when(documentOperations.search(queryCondition)).thenReturn(mock(SearchHits.class));
+        SearchHits<ArticleDocument> mockHits = mock(SearchHits.class);
+        when(documentOperations.search(queryCondition)).thenReturn(mockHits);
 
         // when
-        ArticleSearchResult result = service.search(queryCondition);
+        SearchHits<ArticleDocument> result = repository.search(queryCondition);
 
         // then
-        assertThat(result).isInstanceOf(ArticleSearchResult.class);
+        assertThat(result).isEqualTo(mockHits);
         verify(documentOperations).search(queryCondition);
     }
 
-    @DisplayName("프로젝트의 아티클 검색 시 프로젝트의 아티클 ID 목록을 Elasticsearch에 전달한다.")
+    @DisplayName("프로젝트 검색 요청 시 프로젝트의 아티클 ID 목록을 DocumentOperations에 전달한다.")
     @Test
     void searchInProject() {
         // given
@@ -52,13 +49,14 @@ class ArticleDocumentRepositoryTest {
                         new ArticleFixtureBuilder().id(2L).build())
                 ).build();
 
-        when(documentOperations.searchInIds(List.of(1L, 2L), queryCondition)).thenReturn(mock(SearchHits.class));
+        SearchHits<ArticleDocument> mockHits = mock(SearchHits.class);
+        when(documentOperations.searchInIds(List.of(1L, 2L), queryCondition)).thenReturn(mockHits);
 
         // when
-        ArticleSearchResult result = service.searchInProject(project, queryCondition);
+        SearchHits<ArticleDocument> result = repository.searchInProject(project, queryCondition);
 
         // then
-        assertThat(result).isInstanceOf(ESArticleSearchResult.class);
+        assertThat(result).isEqualTo(mockHits);
         verify(documentOperations).searchInIds(List.of(1L, 2L), queryCondition);
     }
 
@@ -69,7 +67,7 @@ class ArticleDocumentRepositoryTest {
         ArticleDocument document = new ArticleDocument(new ArticleFixtureBuilder().build());
 
         // when
-        service.save(document);
+        repository.save(document);
 
         // then
         verify(documentOperations).save(document);
