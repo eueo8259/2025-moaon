@@ -12,6 +12,7 @@ import moaon.backend.article.domain.Article;
 import moaon.backend.article.domain.ArticleContent;
 import moaon.backend.article.domain.Sector;
 import moaon.backend.article.domain.Topic;
+import moaon.backend.article.event.ArticleEventPublisher;
 import moaon.backend.article.repository.ArticleRepositoryFacade;
 import moaon.backend.article.repository.ArticleSearchResult;
 import moaon.backend.article.repository.db.ArticleContentRepository;
@@ -36,6 +37,7 @@ public class ArticleService {
     private final ArticleContentRepository articleContentRepository;
     private final ProjectRepository projectRepository;
     private final TechStackRepository techStackRepository;
+    private final ArticleEventPublisher articleEventPublisher;
 
     public ArticleResponse getPagedArticles(ArticleQueryCondition queryCondition) {
         ArticleSearchResult result = articleRepositoryFacade.search(queryCondition);
@@ -57,6 +59,7 @@ public class ArticleService {
                 .orElseThrow(() -> new CustomException(ErrorCode.ARTICLE_NOT_FOUND));
         article.addClickCount();
         articleRepositoryFacade.updateClicksCount(article);
+        articleEventPublisher.publishUpdate(article);  // 이벤트 발행 명시적으로
     }
 
     @Transactional
@@ -89,7 +92,8 @@ public class ArticleService {
                             .toList()
             );
 
-            articleRepositoryFacade.save(article);
+            Article saved = articleRepositoryFacade.save(article);
+            articleEventPublisher.publishInsert(saved);  // 이벤트 발행 명시적으로
         }
     }
 }

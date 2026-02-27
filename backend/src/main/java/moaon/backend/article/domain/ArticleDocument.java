@@ -15,8 +15,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import moaon.backend.article.event.domain.EventAction;
-import moaon.backend.article.event.domain.EventOutbox;
 import moaon.backend.global.exception.custom.CustomException;
 import moaon.backend.global.exception.custom.ErrorCode;
 import moaon.backend.techStack.domain.TechStack;
@@ -97,15 +95,6 @@ public class ArticleDocument {
         this.techStacks = setTechStacks(article.getTechStacks());
         this.clicks = article.getClicks();
         this.createdAt = article.getCreatedAt().truncatedTo(ChronoUnit.MILLIS);
-    }
-
-    public EventOutbox toEventOutbox(EventAction eventAction, ObjectMapper objectMapper) {
-        return EventOutbox.builder()
-                .entityId(this.getId())
-                .eventType("articles")
-                .action(eventAction)
-                .payload(convertToJson(this, objectMapper))
-                .build();
     }
 
     private Set<String> setTechStacks(List<TechStack> techStacks) {

@@ -13,6 +13,7 @@ import java.util.Optional;
 import moaon.backend.article.application.ArticleService;
 import moaon.backend.article.application.dto.ArticleCreateRequest;
 import moaon.backend.article.domain.Article;
+import moaon.backend.article.event.ArticleEventPublisher;
 import moaon.backend.article.repository.ArticleRepositoryFacade;
 import moaon.backend.article.repository.db.ArticleContentRepository;
 import moaon.backend.fixture.ArticleFixtureBuilder;
@@ -35,12 +36,14 @@ class ArticleServiceTest {
     private final ArticleContentRepository articleContentRepository = Mockito.mock(ArticleContentRepository.class);
     private final ProjectRepository projectRepository = Mockito.mock(ProjectRepository.class);
     private final TechStackRepository techStackRepository = Mockito.mock(TechStackRepository.class);
+    private final ArticleEventPublisher articleEventPublisher = Mockito.mock(ArticleEventPublisher.class);
 
     private final ArticleService articleService = new ArticleService(
             articleRepositoryFacade,
             articleContentRepository,
             projectRepository,
-            techStackRepository
+            techStackRepository,
+            articleEventPublisher
     );
 
     @DisplayName("존재하지 않는 프로젝트 ID로 검색하면 예외가 발생한다.")
