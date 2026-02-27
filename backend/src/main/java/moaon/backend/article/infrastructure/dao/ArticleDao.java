@@ -62,28 +62,6 @@ public class ArticleDao {
                 .fetch();
     }
 
-    private List<Article> findAllWithScore(Set<Long> ids, ArticleCursor cursor, int limit, ArticleSortType sortType,
-                                           SearchKeyword searchKeyword) {
-        NumberTemplate<Double> score = ArticleFullTextSearchHQLFunction.scoreReference(searchKeyword);
-        List<Tuple> tuples = jpaQueryFactory
-                .select(article, score)
-                .from(article)
-                .where(
-                        idIn(ids),
-                        cursorWhereClause(cursor, sortType, searchKeyword)
-                )
-                .orderBy(toOrderBy(sortType, searchKeyword))
-                .limit(limit + FETCH_EXTRA_FOR_HAS_NEXT)
-                .fetch();
-
-        return tuples.stream()
-                .map(t -> {
-                    Article article = t.get(QArticle.article);
-                    article.setScore(t.get(score));
-                    return article;
-                }).toList();
-    }
-
     public List<Article> findAllBy(
             long projectId,
             Sector sector,
@@ -178,6 +156,28 @@ public class ArticleDao {
                                 .fetchOne()
                 )
                 .orElse(0L);
+    }
+
+    private List<Article> findAllWithScore(Set<Long> ids, ArticleCursor cursor, int limit, ArticleSortType sortType,
+                                           SearchKeyword searchKeyword) {
+        NumberTemplate<Double> score = ArticleFullTextSearchHQLFunction.scoreReference(searchKeyword);
+        List<Tuple> tuples = jpaQueryFactory
+                .select(article, score)
+                .from(article)
+                .where(
+                        idIn(ids),
+                        cursorWhereClause(cursor, sortType, searchKeyword)
+                )
+                .orderBy(toOrderBy(sortType, searchKeyword))
+                .limit(limit + FETCH_EXTRA_FOR_HAS_NEXT)
+                .fetch();
+
+        return tuples.stream()
+                .map(t -> {
+                    Article article = t.get(QArticle.article);
+                    article.setScore(t.get(score));
+                    return article;
+                }).toList();
     }
 
     private BooleanExpression idIn(Set<Long> articleIds) {
