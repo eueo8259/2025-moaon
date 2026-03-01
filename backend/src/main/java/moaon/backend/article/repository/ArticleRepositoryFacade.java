@@ -28,7 +28,7 @@ public class ArticleRepositoryFacade {
     public ArticleSearchResult search(ArticleQueryCondition condition) {
         try {
             SearchHits<ArticleDocument> hits = elasticSearch.search(condition);
-            return wrapSearchHits(hits, condition);  // 조율을 Facade가 담당
+            return wrapSearchHits(hits, condition);
         } catch (Exception e) {
             log.error("검색엔진이 실패하였습니다. 데이터베이스로 검색을 시도합니다.", e);
             return database.findWithSearchConditions(condition);
@@ -39,7 +39,7 @@ public class ArticleRepositoryFacade {
     public ArticleSearchResult searchInProject(Project project, ProjectArticleQueryCondition condition) {
         try {
             SearchHits<ArticleDocument> hits = elasticSearch.searchInProject(project, condition.toArticleCondition());
-            return wrapSearchHits(hits, condition.toArticleCondition());  // 조율을 Facade가 담당
+            return wrapSearchHits(hits, condition.toArticleCondition());
         } catch (Exception e) {
             log.error("검색엔진이 실패하였습니다. 데이터베이스로 검색을 시도합니다.", e);
             return database.findByProjectWithCondition(project, condition); //TODO fallBack 로직 추가하기
