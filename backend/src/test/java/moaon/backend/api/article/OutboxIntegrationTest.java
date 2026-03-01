@@ -11,7 +11,6 @@ import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
-import moaon.backend.article.application.ArticleService;
 import moaon.backend.article.application.dto.ArticleCreateRequest;
 import moaon.backend.article.event.domain.EventOutbox;
 import moaon.backend.article.event.domain.EventStatus;

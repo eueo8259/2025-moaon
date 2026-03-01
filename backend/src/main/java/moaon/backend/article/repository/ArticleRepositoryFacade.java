@@ -42,7 +42,7 @@ public class ArticleRepositoryFacade {
             return wrapSearchHits(hits, condition.toArticleCondition());
         } catch (Exception e) {
             log.error("검색엔진이 실패하였습니다. 데이터베이스로 검색을 시도합니다.", e);
-            return database.findByProjectWithCondition(project, condition); //TODO fallBack 로직 추가하기
+            return database.findByProjectWithCondition(project, condition);
         }
     }
 
@@ -55,7 +55,7 @@ public class ArticleRepositoryFacade {
     }
 
     public Article save(Article article) {
-        return database.save(article); //TODO 이벤트 발행으로 수정 예정
+        return database.save(article);
     }
 
     private ArticleSearchResult wrapSearchHits(SearchHits<ArticleDocument> hits, ArticleQueryCondition condition) {
