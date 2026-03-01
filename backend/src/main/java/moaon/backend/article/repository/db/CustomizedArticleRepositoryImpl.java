@@ -57,8 +57,7 @@ public class CustomizedArticleRepositoryImpl implements CustomizedArticleReposit
         );
     }
 
-    @Override
-    public List<Article> findAllByProjectIdAndCondition(long id, ProjectArticleQueryCondition condition) {
+    private List<Article> findAllByProjectIdAndCondition(long id, ProjectArticleQueryCondition condition) {
         return articleDao.findAllBy(
                 id,
                 condition.sector(),

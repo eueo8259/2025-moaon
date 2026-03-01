@@ -5,9 +5,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import java.util.List;
+import moaon.backend.article.application.ArticleQueryService;
 import moaon.backend.global.cookie.AccessHistory;
 import moaon.backend.global.cookie.TrackingCookieManager;
-import moaon.backend.member.application.MemberService;
 import moaon.backend.project.application.ProjectService;
 import moaon.backend.project.application.dto.PagedProjectResponse;
 import moaon.backend.project.application.dto.ProjectArticleQueryCondition;
@@ -35,17 +35,16 @@ public class ProjectController {
 
     private final TrackingCookieManager cookieManager;
     private final ProjectService projectService;
-    private final ArticleService articleService;
+    private final ArticleQueryService articleQueryService;
 
     public ProjectController(
             @Qualifier("projectViewCookieManager") TrackingCookieManager cookieManager,
             ProjectService projectService,
-            ArticleService articleService,
-            MemberService memberService
+            ArticleQueryService articleQueryService
     ) {
         this.cookieManager = cookieManager;
         this.projectService = projectService;
-        this.articleService = articleService;
+        this.articleQueryService = articleQueryService;
     }
 
     @PostMapping
@@ -54,9 +53,7 @@ public class ProjectController {
             @RequestBody @Valid ProjectCreateRequest projectCreateRequest
     ) {
         Long savedId = projectService.save(token, projectCreateRequest);
-        ProjectCreateResponse response = ProjectCreateResponse.from(savedId);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ProjectCreateResponse.from(savedId));
     }
 
     @GetMapping("/{id}")
@@ -71,10 +68,7 @@ public class ProjectController {
             cookieManager.createOrUpdateCookie(id, accessHistory, response);
             return ResponseEntity.ok(projectDetailResponse);
         }
-
-        ProjectDetailResponse projectDetailResponse = projectService.getById(id);
-
-        return ResponseEntity.ok(projectDetailResponse);
+        return ResponseEntity.ok(projectService.getById(id));
     }
 
     @GetMapping
@@ -86,15 +80,9 @@ public class ProjectController {
             @RequestParam(value = "limit") @Validated @Max(100) int limit,
             @RequestParam(value = "cursor", required = false) String cursor
     ) {
-        ProjectQueryCondition projectQueryCondition = ProjectQueryCondition.of(
-                search,
-                categories,
-                techStacks,
-                sortType,
-                limit,
-                cursor
-        );
-        return ResponseEntity.ok(projectService.getPagedProjects(projectQueryCondition));
+        ProjectQueryCondition condition = ProjectQueryCondition.of(search, categories, techStacks, sortType, limit,
+                cursor);
+        return ResponseEntity.ok(projectService.getPagedProjects(condition));
     }
 
     @GetMapping("/{id}/articles")
@@ -103,10 +91,10 @@ public class ProjectController {
             @RequestParam(value = "sector", required = false) String sector,
             @RequestParam(value = "search", required = false) String search
     ) {
-        ProjectArticleResponse projectArticleResponse = articleService.getByProjectId(
+        ProjectArticleResponse response = articleQueryService.getByProjectId(
                 id,
                 ProjectArticleQueryCondition.from(sector, search)
         );
-        return ResponseEntity.ok(projectArticleResponse);
+        return ResponseEntity.ok(response);
     }
 }
