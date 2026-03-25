@@ -12,7 +12,6 @@ import moaon.backend.article.infrastructure.dao.ArticleDao;
 import moaon.backend.article.repository.ArticleSearchResult;
 import moaon.backend.global.domain.SearchKeyword;
 import moaon.backend.project.application.dto.ProjectArticleQueryCondition;
-import moaon.backend.project.domain.Project;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
@@ -47,8 +46,8 @@ public class CustomizedArticleRepositoryImpl implements CustomizedArticleReposit
     }
 
     @Override
-    public ArticleSearchResult findByProjectWithCondition(Project project, ProjectArticleQueryCondition condition) {
-        List<Article> articles = findAllByProjectIdAndCondition(project.getId(), condition);
+    public ArticleSearchResult findByProjectWithCondition(long projectId, ProjectArticleQueryCondition condition) {
+        List<Article> articles = findAllByProjectIdAndCondition(projectId, condition);
         return new DBArticleSearchResult(
                 articles,
                 articles.size(),
@@ -57,7 +56,7 @@ public class CustomizedArticleRepositoryImpl implements CustomizedArticleReposit
         );
     }
 
-    private List<Article> findAllByProjectIdAndCondition(long id, ProjectArticleQueryCondition condition) {
+    List<Article> findAllByProjectIdAndCondition(long id, ProjectArticleQueryCondition condition) {
         return articleDao.findAllBy(
                 id,
                 condition.sector(),

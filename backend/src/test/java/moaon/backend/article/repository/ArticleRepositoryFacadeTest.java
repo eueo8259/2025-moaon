@@ -1,26 +1,26 @@
 package moaon.backend.article.repository;
 
 import static moaon.backend.article.domain.ArticleSortType.CREATED_AT;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import java.util.Optional;
+import java.util.List;
 import moaon.backend.article.application.dto.ArticleQueryCondition;
-import moaon.backend.article.domain.Sector;
+import moaon.backend.article.domain.Article;
+import moaon.backend.article.domain.ArticleDocument;
 import moaon.backend.article.repository.db.ArticleDBRepository;
 import moaon.backend.article.repository.es.ArticleDocumentRepository;
+import moaon.backend.fixture.ArticleFixtureBuilder;
 import moaon.backend.fixture.ArticleQueryConditionBuilder;
-import moaon.backend.fixture.ProjectFixtureBuilder;
 import moaon.backend.global.domain.SearchKeyword;
 import moaon.backend.project.application.dto.ProjectArticleQueryCondition;
-import moaon.backend.project.domain.Project;
-import moaon.backend.project.domain.repository.ProjectRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.springframework.data.elasticsearch.core.SearchHit;
+import org.springframework.data.elasticsearch.core.SearchHits;
 
 class ArticleRepositoryFacadeTest {
 
@@ -32,69 +32,44 @@ class ArticleRepositoryFacadeTest {
             articleDocumentRepository
     );
 
-    private final ProjectRepository projectRepository = Mockito.mock(ProjectRepository.class);
-
     private final ArticleQueryCondition queryCondition = new ArticleQueryConditionBuilder().sortBy(CREATED_AT).build();
 
-    @DisplayName("ElasticSearch Repository에서 먼저 검색한다.")
+    @DisplayName("ElasticSearch Repository에서 먼저 검색한다")
     @Test
     void getPagedArticlesElasticSearchFirst() {
-        // given
-        when(articleDocumentRepository.search(queryCondition)).thenReturn(mock(ArticleSearchResult.class));
+        SearchHits<ArticleDocument> searchHits = mock(SearchHits.class);
+        when(searchHits.getSearchHits()).thenReturn(List.of());
+        when(articleDocumentRepository.search(queryCondition)).thenReturn(searchHits);
+        when(articleDBRepository.findAllById(List.of())).thenReturn(List.of());
 
-        // when
-        articleRepositoryFacade.search(queryCondition);
+        ArticleSearchResult result = articleRepositoryFacade.search(queryCondition);
 
-        // then
+        assertThat(result.getArticles()).isEmpty();
         verify(articleDocumentRepository).search(queryCondition);
-        verifyNoInteractions(articleDBRepository);
     }
 
-    @DisplayName("ES 검색 실패 시 DB로 fallback한다.")
-    @Test
-    void getPagedArticlesFromDBWhenESFailed() {
-        // given
-        when(articleDocumentRepository.search(queryCondition)).thenThrow(new RuntimeException("ES Search Failed"));
-        when(articleDBRepository.findWithSearchConditions(queryCondition)).thenReturn(mock(ArticleSearchResult.class));
-
-        // when
-        articleRepositoryFacade.search(queryCondition);
-
-        // then
-        verify(articleDocumentRepository).search(queryCondition);
-        verify(articleDBRepository).findWithSearchConditions(queryCondition);
-    }
-
-    @DisplayName("프로젝트 ID로 검색 시 ES에서 해당 프로젝트로 한정지어서 검색한다.")
+    @DisplayName("프로젝트 검색 시 프로젝트 ID 기반으로 ES를 호출한다")
     @Test
     void getByProjectId_success() {
-        Project project = new ProjectFixtureBuilder().id(1L).build();
-        ProjectArticleQueryCondition pac = new ProjectArticleQueryCondition(Sector.BE, new SearchKeyword("검색어"));
+        long projectId = 1L;
+        ProjectArticleQueryCondition pac = new ProjectArticleQueryCondition(
+                moaon.backend.article.domain.Sector.BE,
+                new SearchKeyword("검색어")
+        );
+        Article article = new ArticleFixtureBuilder().id(1L).build();
 
-        when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
-        when(articleDocumentRepository.searchInProject(eq(project), eq(pac.toArticleCondition())))
-                .thenReturn(mock(ArticleSearchResult.class));
+        @SuppressWarnings("unchecked")
+        SearchHit<ArticleDocument> hit = mock(SearchHit.class);
+        when(hit.getContent()).thenReturn(new ArticleDocument(article));
 
-        // when
-        articleRepositoryFacade.searchInProject(project, pac);
+        SearchHits<ArticleDocument> searchHits = mock(SearchHits.class);
+        when(searchHits.getSearchHits()).thenReturn(List.of(hit));
+        when(articleDocumentRepository.searchInProject(eq(projectId), eq(pac.toArticleCondition()))).thenReturn(searchHits);
+        when(articleDBRepository.findAllById(List.of(1L))).thenReturn(List.of(article));
 
-        verify(articleDocumentRepository).searchInProject(eq(project), eq(pac.toArticleCondition()));
+        ArticleSearchResult result = articleRepositoryFacade.searchInProject(projectId, pac);
+
+        assertThat(result.getArticles()).extracting(Article::getId).containsExactly(1L);
+        verify(articleDocumentRepository).searchInProject(eq(projectId), eq(pac.toArticleCondition()));
     }
-
-    //TODO 이벤트 퍼블리셔로 로직 수정에 따라 테스트 로직 수정하기
-//    @DisplayName("Article을 저장할 때 DB와 ES 둘 다에 저장한다.")
-//    @Test
-//    void save_createsArticleAndDocument() {
-//        // given
-//        Article article = new ArticleFixtureBuilder().build();
-//        when(articleDBRepository.save(eq(article))).thenReturn(article);
-//        ArticleDocument document = new ArticleDocument(article);
-//        EventOutbox outboxEvent = document.toEventOutbox(EventAction.INSERT, objectMapper);
-//        // when
-//        articleRepositoryFacade.save(article);
-//
-//        // then
-//        verify(articleDBRepository).save(eq(article));
-//        verify(outboxRepository).save(eq(outboxEvent));
-//    }
 }

@@ -12,7 +12,6 @@ import moaon.backend.article.repository.db.ArticleDBRepository;
 import moaon.backend.article.repository.es.ArticleDocumentRepository;
 import moaon.backend.article.repository.es.ESArticleSearchResult;
 import moaon.backend.project.application.dto.ProjectArticleQueryCondition;
-import moaon.backend.project.domain.Project;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Repository;
@@ -30,19 +29,18 @@ public class ArticleRepositoryFacade {
             SearchHits<ArticleDocument> hits = elasticSearch.search(condition);
             return wrapSearchHits(hits, condition);
         } catch (Exception e) {
-            log.error("검색엔진이 실패하였습니다. 데이터베이스로 검색을 시도합니다.", e);
+            log.error("검색 엔진이 실패했습니다. 데이터베이스로 검색을 시도합니다.", e);
             return database.findWithSearchConditions(condition);
         }
     }
 
-
-    public ArticleSearchResult searchInProject(Project project, ProjectArticleQueryCondition condition) {
+    public ArticleSearchResult searchInProject(long projectId, ProjectArticleQueryCondition condition) {
         try {
-            SearchHits<ArticleDocument> hits = elasticSearch.searchInProject(project, condition.toArticleCondition());
+            SearchHits<ArticleDocument> hits = elasticSearch.searchInProject(projectId, condition.toArticleCondition());
             return wrapSearchHits(hits, condition.toArticleCondition());
         } catch (Exception e) {
-            log.error("검색엔진이 실패하였습니다. 데이터베이스로 검색을 시도합니다.", e);
-            return database.findByProjectWithCondition(project, condition);
+            log.error("검색 엔진이 실패했습니다. 데이터베이스로 검색을 시도합니다.", e);
+            return database.findByProjectWithCondition(projectId, condition);
         }
     }
 

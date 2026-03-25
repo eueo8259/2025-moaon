@@ -30,7 +30,7 @@ public enum ProjectSortType {
 
     ARTICLE_COUNT("articleCount",
             cursor -> CursorParser.toCursor(cursor, new IntegerParser(), ArticleCountProjectCursor::new),
-            project -> new ArticleCountProjectCursor(project.getArticles().size(), project.getId())
+            project -> new ArticleCountProjectCursor(project.getArticleCount(), project.getId())
     );
 
     private final String sortType;

@@ -1,5 +1,6 @@
 package moaon.backend.project.infrastructure.dao;
 
+import static moaon.backend.article.domain.QArticle.article;
 import static moaon.backend.member.domain.QMember.member;
 import static moaon.backend.project.domain.QCategory.category;
 import static moaon.backend.project.domain.QProject.project;
@@ -10,6 +11,7 @@ import static moaon.backend.shared.domain.QTechStack.techStack;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.core.types.dsl.SimpleExpression;
 import com.querydsl.core.types.dsl.Wildcard;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -70,6 +72,31 @@ public class ProjectDao {
         int limit = condition.limit();
 
         int fetchExtraForHasNext = 1;
+        if (sortBy == ProjectSortType.ARTICLE_COUNT) {
+            NumberExpression<Long> articleCount = article.id.count();
+            List<com.querydsl.core.Tuple> tuples = jpaQueryFactory
+                    .select(project, articleCount)
+                    .from(project)
+                    .leftJoin(article).on(article.project.id.eq(project.id))
+                    .where(
+                            idsInCondition(projectIdsByFilter),
+                            applyCursor(cursor)
+                    )
+                    .groupBy(project.id)
+                    .orderBy(articleCount.desc(), project.id.desc())
+                    .limit(limit + fetchExtraForHasNext)
+                    .fetch();
+
+            return tuples.stream()
+                    .map(tuple -> {
+                        Project fetchedProject = tuple.get(project);
+                        Long count = tuple.get(articleCount);
+                        fetchedProject.setArticleCount(count == null ? 0 : count.intValue());
+                        return fetchedProject;
+                    })
+                    .toList();
+        }
+
         return jpaQueryFactory.selectFrom(project)
                 .where(
                         idsInCondition(projectIdsByFilter),
@@ -205,7 +232,7 @@ public class ProjectDao {
         }
 
         if (sortBy == ProjectSortType.ARTICLE_COUNT) {
-            return new OrderSpecifier<?>[]{project.articles.size().desc(), project.id.desc()};
+            return new OrderSpecifier<?>[]{article.id.count().desc(), project.id.desc()};
         }
 
         return new OrderSpecifier<?>[]{project.lovedMembers.size().desc(), project.id.desc()};
