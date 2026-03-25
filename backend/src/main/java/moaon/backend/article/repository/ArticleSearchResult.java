@@ -2,7 +2,6 @@ package moaon.backend.article.repository;
 
 import java.util.List;
 import moaon.backend.article.domain.Article;
-import moaon.backend.article.domain.ArticleCursor;
 
 public interface ArticleSearchResult {
 
@@ -12,5 +11,5 @@ public interface ArticleSearchResult {
 
     boolean hasNext();
 
-    ArticleCursor getNextCursor();
+    String getNextCursor();
 }

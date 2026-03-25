@@ -8,33 +8,41 @@ import moaon.backend.fixture.Fixture;
 import moaon.backend.fixture.ProjectFixtureBuilder;
 import moaon.backend.fixture.ProjectQueryConditionFixtureBuilder;
 import moaon.backend.fixture.RepositoryHelper;
+import moaon.backend.global.cursor.CursorCodec;
 import moaon.backend.global.config.QueryDslConfig;
+import moaon.backend.project.application.repository.ProjectQueryRepository;
 import moaon.backend.member.domain.Member;
 import moaon.backend.project.application.dto.ProjectQueryCondition;
-import moaon.backend.project.domain.Category;
+import moaon.backend.category.domain.Category;
 import moaon.backend.project.domain.Project;
 import moaon.backend.project.domain.ProjectSortType;
 import moaon.backend.project.domain.Projects;
-import moaon.backend.project.infrastructure.CustomizedProjectRepositoryImpl;
 import moaon.backend.project.infrastructure.dao.ProjectDao;
-import moaon.backend.techStack.domain.TechStack;
+import moaon.backend.project.infrastructure.sort.ProjectSortSpecFactory;
+import moaon.backend.techstack.domain.TechStack;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.transaction.annotation.Transactional;
 
-@Transactional
-@SpringBootTest
-@Import({RepositoryHelper.class, QueryDslConfig.class, ProjectDao.class})
+@ProjectRepositorySliceTest
 class CustomizedProjectRepositoryImplTest {
 
     @Autowired
-    private CustomizedProjectRepositoryImpl customizedProjectRepositoryImpl;
+    private ProjectQueryRepository projectQueryRepository;
 
     @Autowired
     private RepositoryHelper repositoryHelper;
+
+    @Autowired
+    private ProjectSortSpecFactory projectSortSpecFactory;
+
+    private Projects findProjects(ProjectQueryCondition queryCondition) {
+        return projectQueryRepository.findWithSearchConditions(
+                queryCondition,
+                projectSortSpecFactory.get(queryCondition.projectSortType()),
+                CursorCodec.decode(queryCondition.cursor())
+        );
+    }
 
     @DisplayName("조건 없이 모든 프로젝트를 조회한다.")
     @Test
@@ -47,7 +55,7 @@ class CustomizedProjectRepositoryImplTest {
         ProjectQueryCondition projectQueryCondition = new ProjectQueryConditionFixtureBuilder().build();
 
         //when
-        Projects projects = customizedProjectRepositoryImpl.findWithSearchConditions(projectQueryCondition);
+        Projects projects = findProjects(projectQueryCondition);
 
         //then
         assertThat(projects.getCount()).isEqualTo(3);
@@ -85,7 +93,7 @@ class CustomizedProjectRepositoryImplTest {
                         category5.getName())
                 .build();
 
-        Projects projects = customizedProjectRepositoryImpl.findWithSearchConditions(queryCondition);
+        Projects projects = findProjects(queryCondition);
 
         // then
         assertThat(projects.getProjects()).containsOnlyOnce(projectWantToFind);
@@ -123,7 +131,7 @@ class CustomizedProjectRepositoryImplTest {
                         techStack4.getName())
                 .build();
 
-        Projects projects = customizedProjectRepositoryImpl.findWithSearchConditions(queryCondition);
+        Projects projects = findProjects(queryCondition);
 
         // then
         assertThat(projects.getProjects()).containsExactlyInAnyOrder(projectWantToFind);
@@ -167,7 +175,7 @@ class CustomizedProjectRepositoryImplTest {
                 .build();
 
         // when
-        Projects actual = customizedProjectRepositoryImpl.findWithSearchConditions(queryCondition);
+        Projects actual = findProjects(queryCondition);
 
         // then
         assertThat(actual.getProjects()).containsOnlyOnce(wantToFindProject);
@@ -192,7 +200,7 @@ class CustomizedProjectRepositoryImplTest {
                 .sortBy(ProjectSortType.VIEWS)
                 .build();
 
-        Projects projects = customizedProjectRepositoryImpl.findWithSearchConditions(queryCondition);
+        Projects projects = findProjects(queryCondition);
 
         // then
         assertThat(projects.getProjects()).containsExactly(high, middle, low);
@@ -219,7 +227,7 @@ class CustomizedProjectRepositoryImplTest {
                 .sortBy(ProjectSortType.ARTICLE_COUNT)
                 .build();
 
-        Projects projects = customizedProjectRepositoryImpl.findWithSearchConditions(queryCondition);
+        Projects projects = findProjects(queryCondition);
 
         // then
         assertThat(projects.getProjects()).containsExactly(high, middle, low);
@@ -250,7 +258,7 @@ class CustomizedProjectRepositoryImplTest {
                 .sortBy(ProjectSortType.CREATED_AT)
                 .build();
 
-        Projects projects = customizedProjectRepositoryImpl.findWithSearchConditions(queryCondition);
+        Projects projects = findProjects(queryCondition);
 
         // then
         assertThat(projects.getProjects()).containsExactly(tomorrowProject, todayProject, yesterdayProject);
@@ -277,7 +285,7 @@ class CustomizedProjectRepositoryImplTest {
                 .sortBy(ProjectSortType.LOVES)
                 .build();
 
-        Projects projects = customizedProjectRepositoryImpl.findWithSearchConditions(queryCondition);
+        Projects projects = findProjects(queryCondition);
 
         // then
         assertThat(projects.getProjects()).containsExactly(high, middle, low);
@@ -321,7 +329,7 @@ class CustomizedProjectRepositoryImplTest {
                 .build();
 
         // when
-        Projects projects = customizedProjectRepositoryImpl.findWithSearchConditions(queryCondition);
+        Projects projects = findProjects(queryCondition);
 
         // then
         assertThat(projects.getCount()).isEqualTo(3);

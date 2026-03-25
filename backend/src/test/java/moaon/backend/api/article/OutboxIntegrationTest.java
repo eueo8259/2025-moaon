@@ -11,6 +11,7 @@ import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import moaon.backend.article.application.ArticleCommandService;
 import moaon.backend.article.application.dto.ArticleCreateRequest;
 import moaon.backend.article.event.domain.EventOutbox;
 import moaon.backend.article.event.domain.EventStatus;
@@ -22,7 +23,7 @@ import moaon.backend.fixture.ProjectFixtureBuilder;
 import moaon.backend.fixture.RepositoryHelper;
 import moaon.backend.global.config.QueryDslConfig;
 import moaon.backend.project.domain.Project;
-import moaon.backend.techStack.domain.TechStack;
+import moaon.backend.techstack.domain.TechStack;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -40,7 +41,7 @@ class OutboxIntegrationTest {
     private RepositoryHelper repositoryHelper;
 
     @Autowired
-    private ArticleService articleService;
+    private ArticleCommandService articleService;
 
     @Autowired
     private EventOutboxRepository outboxRepository;

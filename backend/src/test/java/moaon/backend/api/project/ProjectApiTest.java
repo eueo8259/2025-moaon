@@ -38,13 +38,14 @@ import moaon.backend.project.application.dto.ProjectArticleResponse;
 import moaon.backend.project.application.dto.ProjectCreateRequest;
 import moaon.backend.project.application.dto.ProjectCreateResponse;
 import moaon.backend.project.application.dto.ProjectDetailResponse;
-import moaon.backend.project.domain.Category;
+import moaon.backend.category.domain.Category;
 import moaon.backend.project.domain.Project;
-import moaon.backend.techStack.domain.TechStack;
+import moaon.backend.techstack.domain.TechStack;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.context.annotation.Import;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
@@ -299,11 +300,10 @@ public class ProjectApiTest extends BaseApiTest {
                         .build()
         );
 
-        when(articleDocumentRepository.searchInProject(eq(targetProject), any(ArticleQueryCondition.class)))
-                .thenReturn(new DBArticleSearchResult(
-                        List.of(filteredArticle1, filteredArticle2, filteredArticle3),
-                        6, 20, null
-                ));
+        SearchHits searchHits = org.mockito.Mockito.mock(SearchHits.class);
+        when(searchHits.getSearchHits()).thenReturn(List.of());
+        when(articleDocumentRepository.searchInProject(eq(targetProject.getId()), any(ArticleQueryCondition.class)))
+                .thenReturn(searchHits);
 
         // when
         ProjectArticleResponse actualResponse = RestAssured.given(documentationSpecification).log().all()

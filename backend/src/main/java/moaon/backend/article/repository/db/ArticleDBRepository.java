@@ -14,6 +14,9 @@ public interface ArticleDBRepository extends JpaRepository<Article, Long>, Custo
 
     Long countByProjectIdAndSector(long id, Sector sector);
 
+    @Query("select a.id from Article a where a.project.id = :projectId")
+    List<Long> findIdsByProjectId(@Param("projectId") long projectId);
+
     @Query("select a from Article a")
     Stream<Article> streamAll();
 

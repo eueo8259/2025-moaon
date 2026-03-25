@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
-import moaon.backend.article.domain.ArticleCursor;
 import moaon.backend.article.domain.ArticleSortType;
 import moaon.backend.article.domain.Sector;
 import moaon.backend.article.domain.Topic;
@@ -34,7 +33,7 @@ public class ArticleSearchRequest {
                 techStacks,
                 ArticleSortType.from(sort),
                 limit,
-                cursor == null ? null : new ArticleCursor(cursor)
+                cursor
         );
     }
 

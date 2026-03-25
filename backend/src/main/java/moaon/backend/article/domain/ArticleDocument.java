@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import moaon.backend.global.exception.custom.CustomException;
 import moaon.backend.global.exception.custom.ErrorCode;
-import moaon.backend.techStack.domain.TechStack;
+import moaon.backend.techstack.domain.TechStack;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Alias;
 import org.springframework.data.elasticsearch.annotations.DateFormat;

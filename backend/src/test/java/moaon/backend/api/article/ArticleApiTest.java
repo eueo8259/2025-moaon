@@ -32,7 +32,7 @@ import moaon.backend.member.application.MemberService;
 import moaon.backend.member.domain.Member;
 import moaon.backend.member.repository.MemberRepository;
 import moaon.backend.project.domain.Project;
-import moaon.backend.techStack.domain.TechStack;
+import moaon.backend.techstack.domain.TechStack;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import moaon.backend.article.domain.Article;
 import moaon.backend.article.domain.Topic;
-import moaon.backend.techStack.domain.TechStack;
+import moaon.backend.techstack.domain.TechStack;
 
 public record ArticleDetailResponse(
         long id,

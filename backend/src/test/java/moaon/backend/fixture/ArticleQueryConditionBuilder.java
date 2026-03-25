@@ -3,10 +3,11 @@ package moaon.backend.fixture;
 import java.util.Arrays;
 import java.util.List;
 import moaon.backend.article.application.dto.ArticleQueryCondition;
-import moaon.backend.article.domain.ArticleCursor;
 import moaon.backend.article.domain.ArticleSortType;
 import moaon.backend.article.domain.Sector;
 import moaon.backend.article.domain.Topic;
+import moaon.backend.global.cursor.CursorCodec;
+import moaon.backend.global.cursor.CursorToken;
 import moaon.backend.global.domain.SearchKeyword;
 
 public class ArticleQueryConditionBuilder {
@@ -17,7 +18,7 @@ public class ArticleQueryConditionBuilder {
     private List<String> techStackNames;
     private ArticleSortType sortBy;
     private int limit;
-    private ArticleCursor articleCursor;
+    private String articleCursor;
 
     public ArticleQueryConditionBuilder() {
         this.search = new SearchKeyword(null);
@@ -64,8 +65,13 @@ public class ArticleQueryConditionBuilder {
         return this;
     }
 
-    public ArticleQueryConditionBuilder cursor(ArticleCursor cursor) {
+    public ArticleQueryConditionBuilder cursor(String cursor) {
         this.articleCursor = cursor;
+        return this;
+    }
+
+    public ArticleQueryConditionBuilder cursor(CursorToken cursorToken) {
+        this.articleCursor = CursorCodec.encode(cursorToken);
         return this;
     }
 

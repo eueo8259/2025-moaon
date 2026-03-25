@@ -17,7 +17,7 @@ import moaon.backend.global.exception.custom.ErrorCode;
 import moaon.backend.member.domain.Member;
 import moaon.backend.project.domain.Project;
 import moaon.backend.project.domain.repository.ProjectRepository;
-import moaon.backend.techStack.repository.TechStackRepository;
+import moaon.backend.techstack.domain.repository.TechStackRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

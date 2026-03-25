@@ -1,7 +1,6 @@
 package moaon.backend.article.application.dto;
 
 import java.util.List;
-import moaon.backend.article.domain.ArticleCursor;
 import moaon.backend.article.domain.ArticleSortType;
 import moaon.backend.article.domain.Sector;
 import moaon.backend.article.domain.Topic;
@@ -14,10 +13,13 @@ public record ArticleQueryCondition(
         List<String> techStackNames,
         ArticleSortType sortType,
         int limit,
-        ArticleCursor cursor
+        String cursor
 ) {
 
     public ArticleQueryCondition {
+        if (sortType == null) {
+            sortType = ArticleSortType.CREATED_AT;
+        }
         boolean cannotKeepRelevance = ArticleSortType.RELEVANCE == sortType && !search.hasValue();
         if (cannotKeepRelevance) {
             sortType = ArticleSortType.CREATED_AT;

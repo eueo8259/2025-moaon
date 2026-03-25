@@ -2,11 +2,11 @@ package moaon.backend.project.application.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import moaon.backend.project.domain.Category;
+import moaon.backend.category.domain.Category;
 import moaon.backend.project.domain.Project;
 import moaon.backend.project.domain.ProjectCategory;
-import moaon.backend.techStack.domain.ProjectTechStack;
-import moaon.backend.techStack.domain.TechStack;
+import moaon.backend.project.domain.ProjectTechStack;
+import moaon.backend.techstack.domain.TechStack;
 
 public record ProjectDetailResponse(
         long id,
