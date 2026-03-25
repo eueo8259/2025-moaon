@@ -1,4 +1,4 @@
-package moaon.backend.project.domain;
+package moaon.backend.category.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

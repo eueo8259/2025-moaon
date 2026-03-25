@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import moaon.backend.member.domain.Member;
-import moaon.backend.project.domain.Category;
+import moaon.backend.category.domain.Category;
 import moaon.backend.project.domain.Images;
 import moaon.backend.project.domain.Project;
-import moaon.backend.shared.domain.TechStack;
+import moaon.backend.techstack.domain.TechStack;
 
 public class ProjectFixtureBuilder {
 

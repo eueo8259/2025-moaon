@@ -11,6 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import moaon.backend.category.domain.Category;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

@@ -2,11 +2,11 @@ package moaon.backend.project.infrastructure.dao;
 
 import static moaon.backend.article.domain.QArticle.article;
 import static moaon.backend.member.domain.QMember.member;
-import static moaon.backend.project.domain.QCategory.category;
+import static moaon.backend.category.domain.QCategory.category;
 import static moaon.backend.project.domain.QProject.project;
 import static moaon.backend.project.domain.QProjectCategory.projectCategory;
 import static moaon.backend.project.domain.QProjectTechStack.projectTechStack;
-import static moaon.backend.shared.domain.QTechStack.techStack;
+import static moaon.backend.techstack.domain.QTechStack.techStack;
 
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;

@@ -1,8 +1,8 @@
-package moaon.backend.project.domain.repository;
+package moaon.backend.category.domain.repository;
 
 import java.util.List;
 import java.util.Optional;
-import moaon.backend.project.domain.Category;
+import moaon.backend.category.domain.Category;
 
 public interface CategoryRepository {
 

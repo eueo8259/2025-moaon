@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import moaon.backend.shared.domain.TechStack;
+import moaon.backend.techstack.domain.TechStack;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

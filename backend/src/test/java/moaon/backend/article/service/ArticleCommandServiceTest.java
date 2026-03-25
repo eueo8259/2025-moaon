@@ -21,7 +21,7 @@ import moaon.backend.global.exception.custom.ErrorCode;
 import moaon.backend.global.parser.URLParser;
 import moaon.backend.member.domain.Member;
 import moaon.backend.project.domain.repository.ProjectRepository;
-import moaon.backend.article.infrastructure.TechStackRepository;
+import moaon.backend.techstack.domain.repository.TechStackRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

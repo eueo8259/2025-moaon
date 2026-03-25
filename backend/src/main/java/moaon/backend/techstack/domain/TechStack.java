@@ -1,4 +1,4 @@
-package moaon.backend.shared.domain;
+package moaon.backend.techstack.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

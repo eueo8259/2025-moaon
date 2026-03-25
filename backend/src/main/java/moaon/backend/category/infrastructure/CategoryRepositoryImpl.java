@@ -1,10 +1,10 @@
-package moaon.backend.project.infrastructure;
+package moaon.backend.category.infrastructure;
 
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import moaon.backend.project.domain.Category;
-import moaon.backend.project.domain.repository.CategoryRepository;
+import moaon.backend.category.domain.Category;
+import moaon.backend.category.domain.repository.CategoryRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository

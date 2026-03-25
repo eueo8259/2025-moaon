@@ -1,7 +1,7 @@
-package moaon.backend.project.infrastructure;
+package moaon.backend.category.infrastructure;
 
 import java.util.Optional;
-import moaon.backend.project.domain.Category;
+import moaon.backend.category.domain.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 interface CategoryJpaRepository extends JpaRepository<Category, Long> {

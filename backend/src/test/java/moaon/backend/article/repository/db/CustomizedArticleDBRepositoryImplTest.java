@@ -11,27 +11,21 @@ import moaon.backend.article.domain.ArticleCursor;
 import moaon.backend.article.domain.ArticleSortType;
 import moaon.backend.article.domain.Sector;
 import moaon.backend.article.domain.Topic;
-import moaon.backend.article.infrastructure.dao.ArticleDao;
 import moaon.backend.fixture.ArticleFixtureBuilder;
 import moaon.backend.fixture.ArticleQueryConditionBuilder;
 import moaon.backend.fixture.Fixture;
 import moaon.backend.fixture.ProjectArticleQueryConditionFixtureBuilder;
 import moaon.backend.fixture.ProjectFixtureBuilder;
 import moaon.backend.fixture.RepositoryHelper;
-import moaon.backend.global.config.QueryDslConfig;
 import moaon.backend.project.application.dto.ProjectArticleQueryCondition;
 import moaon.backend.project.domain.Project;
-import moaon.backend.project.infrastructure.dao.ProjectDao;
-import moaon.backend.shared.domain.TechStack;
+import moaon.backend.techstack.domain.TechStack;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
 
-@DataJpaTest
-@Import({RepositoryHelper.class, QueryDslConfig.class, ArticleDao.class, ProjectDao.class})
+@ArticleRepositorySliceTest
 class CustomizedArticleDBRepositoryImplTest {
 
     @Autowired
@@ -39,9 +33,6 @@ class CustomizedArticleDBRepositoryImplTest {
 
     @Autowired
     private RepositoryHelper repositoryHelper;
-
-    @Autowired
-    private CustomizedArticleRepositoryImpl customizedArticleRepositoryImpl;
 
     @DisplayName("아티클 필터링 테스트")
     @Nested
@@ -447,7 +438,7 @@ class CustomizedArticleDBRepositoryImplTest {
                     .build();
 
             // when
-            List<Article> articles = customizedArticleRepositoryImpl.findWithSearchConditions(queryCondition)
+            List<Article> articles = customizedArticleRepository.findWithSearchConditions(queryCondition)
                     .getArticles();
 
             // then
