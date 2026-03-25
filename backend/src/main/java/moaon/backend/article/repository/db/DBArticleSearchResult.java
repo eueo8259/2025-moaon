@@ -5,8 +5,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import moaon.backend.article.domain.Article;
-import moaon.backend.article.domain.ArticleCursor;
 import moaon.backend.article.domain.ArticleSortType;
+import moaon.backend.article.infrastructure.sort.ArticleSortSpec;
 import moaon.backend.article.repository.ArticleSearchResult;
 
 @RequiredArgsConstructor
@@ -21,6 +21,7 @@ public class DBArticleSearchResult implements ArticleSearchResult {
     private final long totalCount;
     private final int limit;
     private final ArticleSortType sortType;
+    private final ArticleSortSpec sortSpec;
 
     @Override
     public List<Article> getArticles() {
@@ -37,33 +38,19 @@ public class DBArticleSearchResult implements ArticleSearchResult {
     }
 
     @Override
-    public ArticleCursor getNextCursor() {
+    public String getNextCursor() {
         if (hasNext()) {
             return generateCursor();
         }
         return null;
     }
 
-    private ArticleCursor generateCursor() {
+    private String generateCursor() {
         Article lastArticle = getArticles().getLast();
-        Long lastId = lastArticle.getId();
-
-        if (ArticleSortType.CREATED_AT == sortType) {
-            return new ArticleCursor(lastArticle.getCreatedAt(), lastId);
-        }
-
-        if (ArticleSortType.CLICKS == sortType) {
-            return new ArticleCursor(lastArticle.getClicks(), lastId);
-        }
-
-        if (ArticleSortType.RELEVANCE == sortType) {
-            return new ArticleCursor(lastArticle.getScore(), lastId);
-        }
-
-        return null;
+        return sortSpec.createNextCursor(lastArticle);
     }
 
     public static DBArticleSearchResult empty() {
-        return new DBArticleSearchResult(List.of(), 0, 0, null);
+        return new DBArticleSearchResult(List.of(), 0, 0, null, null);
     }
 }

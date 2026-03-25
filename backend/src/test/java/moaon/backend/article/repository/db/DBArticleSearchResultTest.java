@@ -6,15 +6,15 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import moaon.backend.article.domain.Article;
-import moaon.backend.article.domain.ArticleCursor;
 import moaon.backend.article.domain.ArticleSortType;
+import moaon.backend.article.infrastructure.sort.ClicksArticleSortSpec;
 import moaon.backend.article.repository.ArticleSearchResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class DBArticleSearchResultTest {
 
-    @DisplayName("비어있는 ArticleSearchResult를 만든다.")
+    @DisplayName("빈 ArticleSearchResult를 만든다")
     @Test
     void empty() {
         ArticleSearchResult articles = DBArticleSearchResult.empty();
@@ -26,75 +26,68 @@ class DBArticleSearchResultTest {
         );
     }
 
-    @DisplayName("limit와 articles의 크기를 비교해 최종적으로 반환할 아티클 리스트를 반환한다.")
+    @DisplayName("limit보다 1개 더 조회된 경우 limit까지만 반환한다")
     @Test
     void getArticles() {
-        // given
         List<Article> threeArticles = List.of(anyArticle(), anyArticle(), anyArticle());
-        DBArticleSearchResult articles = new DBArticleSearchResult(threeArticles, 4, 2, ArticleSortType.CLICKS);
+        DBArticleSearchResult articles = new DBArticleSearchResult(
+                threeArticles,
+                4,
+                2,
+                ArticleSortType.CLICKS,
+                new ClicksArticleSortSpec()
+        );
 
-        // when
-        List<Article> toReturn = articles.getArticles();
-
-        // then
-        assertThat(toReturn).hasSize(2);
+        assertThat(articles.getArticles()).hasSize(2);
     }
 
-    @DisplayName("최종적으로 반환될 아티클 중 마지막 아티클의 커서를 반환한다.")
+    @DisplayName("다음 커서는 마지막 반환 아티클의 ID를 포함한다")
     @Test
     void getNextCursor() {
-        // given
         List<Article> threeArticles = List.of(anyArticle(), anyArticle(), anyArticle());
-        DBArticleSearchResult articles = new DBArticleSearchResult(threeArticles, 4, 2, ArticleSortType.CLICKS);
+        DBArticleSearchResult articles = new DBArticleSearchResult(
+                threeArticles,
+                4,
+                2,
+                ArticleSortType.CLICKS,
+                new ClicksArticleSortSpec()
+        );
+
         Article finallyLastArticle = articles.getArticles().getLast();
+        String nextCursor = articles.getNextCursor();
 
-        // when
-        ArticleCursor nextCursor = articles.getNextCursor();
-
-        // then
-        assertThat(nextCursor.getLastId()).isEqualTo(finallyLastArticle.getId());
+        assertThat(nextCursor).endsWith("_" + finallyLastArticle.getId());
     }
 
-    // 1개를 의도적으로 더 조회해서, 리스트의 크기가 limit보다 크면 더 존재한다고 판단
-    @DisplayName("아티클이 더 존재하는 지 알 수 있다. - true")
+    @DisplayName("다음 페이지가 존재하면 true를 반환한다")
     @Test
     void hasNextTrue() {
-        // given
-        List<Article> threeArticles = List.of(anyArticle(), anyArticle(), anyArticle());
         DBArticleSearchResult articles = new DBArticleSearchResult(
-                threeArticles, // 현재 페이지 : 3개
-                999, // 전체 아티클 개수
-                2, // 페이지 크기
-                ArticleSortType.CLICKS
+                List.of(anyArticle(), anyArticle(), anyArticle()),
+                999,
+                2,
+                ArticleSortType.CLICKS,
+                new ClicksArticleSortSpec()
         );
 
-        // when
-        boolean hasNext = articles.hasNext();
-
-        // then
-        assertThat(hasNext).isTrue();
+        assertThat(articles.hasNext()).isTrue();
     }
 
-    @DisplayName("아티클이 더 존재하는 지 알 수 있다. - false")
+    @DisplayName("다음 페이지가 없으면 false를 반환한다")
     @Test
     void hasNextFalse() {
-        // given
-        List<Article> threeArticles = List.of(anyArticle(), anyArticle(), anyArticle());
         DBArticleSearchResult articles = new DBArticleSearchResult(
-                threeArticles, // 현재 페이지 : 3개
-                999, // 전체 아티클 개수
-                3, // 페이지 크기
-                ArticleSortType.CLICKS
+                List.of(anyArticle(), anyArticle(), anyArticle()),
+                999,
+                3,
+                ArticleSortType.CLICKS,
+                new ClicksArticleSortSpec()
         );
 
-        // when
-        boolean hasNext = articles.hasNext();
-
-        // then
-        assertThat(hasNext).isFalse();
+        assertThat(articles.hasNext()).isFalse();
     }
 
-    private AtomicLong seq = new AtomicLong(1);
+    private final AtomicLong seq = new AtomicLong(1);
 
     private Article anyArticle() {
         return Article.builder()

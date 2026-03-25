@@ -4,6 +4,10 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import moaon.backend.article.infrastructure.sort.ArticleSortSpecFactory;
+import moaon.backend.article.infrastructure.sort.ClicksArticleSortSpec;
+import moaon.backend.article.infrastructure.sort.CreatedAtArticleSortSpec;
+import moaon.backend.article.infrastructure.sort.RelevanceArticleSortSpec;
 import moaon.backend.category.infrastructure.CategoryRepositoryImpl;
 import moaon.backend.fixture.RepositoryHelper;
 import moaon.backend.global.config.QueryDslConfig;
@@ -28,7 +32,11 @@ import org.springframework.test.context.TestPropertySource;
         ProjectDao.class,
         ProjectRepositoryImpl.class,
         CategoryRepositoryImpl.class,
-        TechStackRepositoryImpl.class
+        TechStackRepositoryImpl.class,
+        ArticleSortSpecFactory.class,
+        CreatedAtArticleSortSpec.class,
+        ClicksArticleSortSpec.class,
+        RelevanceArticleSortSpec.class
 })
 @TestPropertySource(properties = {
         "spring.datasource.driver-class-name=org.h2.Driver",

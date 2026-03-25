@@ -8,9 +8,11 @@ import lombok.extern.slf4j.Slf4j;
 import moaon.backend.article.application.dto.ArticleQueryCondition;
 import moaon.backend.article.domain.Article;
 import moaon.backend.article.domain.ArticleDocument;
+import moaon.backend.article.infrastructure.sort.ArticleSortSpec;
 import moaon.backend.article.repository.db.ArticleDBRepository;
 import moaon.backend.article.repository.es.ArticleDocumentRepository;
 import moaon.backend.article.repository.es.ESArticleSearchResult;
+import moaon.backend.global.cursor.CursorToken;
 import moaon.backend.project.application.dto.ProjectArticleQueryCondition;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
@@ -24,23 +26,32 @@ public class ArticleRepositoryFacade {
     private final ArticleDBRepository database;
     private final ArticleDocumentRepository elasticSearch;
 
-    public ArticleSearchResult search(ArticleQueryCondition condition) {
+    public ArticleSearchResult search(
+            ArticleQueryCondition condition,
+            ArticleSortSpec sortSpec,
+            CursorToken cursorToken
+    ) {
         try {
             SearchHits<ArticleDocument> hits = elasticSearch.search(condition);
             return wrapSearchHits(hits, condition);
-        } catch (Exception e) {
-            log.error("검색 엔진이 실패했습니다. 데이터베이스로 검색을 시도합니다.", e);
-            return database.findWithSearchConditions(condition);
+        } catch (Exception exception) {
+            log.error("검색엔진 조회에 실패하여 데이터베이스 조회로 대체합니다.", exception);
+            return database.findWithSearchConditions(condition, sortSpec, cursorToken);
         }
     }
 
-    public ArticleSearchResult searchInProject(long projectId, ProjectArticleQueryCondition condition) {
+    public ArticleSearchResult searchInProject(
+            long projectId,
+            ProjectArticleQueryCondition condition,
+            ArticleSortSpec sortSpec,
+            CursorToken cursorToken
+    ) {
         try {
             SearchHits<ArticleDocument> hits = elasticSearch.searchInProject(projectId, condition.toArticleCondition());
             return wrapSearchHits(hits, condition.toArticleCondition());
-        } catch (Exception e) {
-            log.error("검색 엔진이 실패했습니다. 데이터베이스로 검색을 시도합니다.", e);
-            return database.findByProjectWithCondition(projectId, condition);
+        } catch (Exception exception) {
+            log.error("검색엔진 조회에 실패하여 데이터베이스 조회로 대체합니다.", exception);
+            return database.findByProjectWithCondition(projectId, condition, sortSpec, cursorToken);
         }
     }
 
@@ -64,7 +75,7 @@ public class ArticleRepositoryFacade {
 
         List<Article> articles = database.findAllById(ids)
                 .stream()
-                .sorted(Comparator.comparingInt(a -> ids.indexOf(a.getId())))
+                .sorted(Comparator.comparingInt(article -> ids.indexOf(article.getId())))
                 .toList();
 
         return new ESArticleSearchResult(hits, articles, condition.limit());

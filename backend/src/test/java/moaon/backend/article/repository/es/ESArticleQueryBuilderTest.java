@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.List;
 import moaon.backend.article.application.dto.ArticleQueryCondition;
-import moaon.backend.article.domain.ArticleCursor;
 import moaon.backend.article.domain.ArticleSortType;
 import moaon.backend.article.domain.Sector;
 import moaon.backend.article.domain.Topic;
+import moaon.backend.global.cursor.CursorToken;
 import moaon.backend.global.domain.SearchKeyword;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,31 +18,29 @@ import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 
 class ESArticleQueryBuilderTest {
 
-    @DisplayName("Article ID 목록으로 Filter 쿼리 안에 Terms 쿼리를 만든다.")
+    @DisplayName("Article ID 목록으로 filter query를 만든다")
     @Test
-    void withIds_addsTermsFilter() {
+    void withIdsAddsTermsFilter() {
         NativeQuery query = new ESArticleQueryBuilder()
                 .withIds(List.of(1L, 2L, 3L))
                 .build();
 
-        // then
         assertThat(query.getQuery().toString()).containsSubsequence("filter", "terms", "id", "[1,2,3]");
     }
 
-    @DisplayName("검색어를 포함하면 multi_match 쿼리에 추가된다.")
+    @DisplayName("검색어가 있으면 multi_match query를 추가한다")
     @Test
-    void withTextSearch_addsMustQuery() {
+    void withTextSearchAddsMustQuery() {
         NativeQuery query = new ESArticleQueryBuilder()
-                .withTextSearch(new SearchKeyword("버저닝"))
+                .withTextSearch(new SearchKeyword("백엔드"))
                 .build();
 
-        assertThat(query.getQuery().toString())
-                .containsSubsequence("multi_match", "query", "버저닝");
+        assertThat(query.getQuery().toString()).containsSubsequence("multi_match", "query", "백엔드");
     }
 
-    @DisplayName("검색어가 비어있으면 multi_match 쿼리를 추가하지 않는다.")
+    @DisplayName("비어 있는 검색어는 multi_match query를 만들지 않는다")
     @Test
-    void withEmptyText_throwsException() {
+    void withEmptyTextSkipsQuery() {
         NativeQuery query = new ESArticleQueryBuilder()
                 .withTextSearch(new SearchKeyword(""))
                 .build();
@@ -50,20 +48,19 @@ class ESArticleQueryBuilderTest {
         assertThat(query.getQuery().toString()).doesNotContain("multi_match", "query");
     }
 
-    @DisplayName("Sector 필터를 추가하면 Filter 쿼리 안에 Term 쿼리를 만든다.")
+    @DisplayName("sector filter를 추가한다")
     @Test
-    void withSector_addsFilter() {
+    void withSectorAddsFilter() {
         NativeQuery query = new ESArticleQueryBuilder()
                 .withSector(Sector.FE)
                 .build();
 
-        assertThat(query.getQuery().toString())
-                .containsSubsequence("filter", "term", "sector", "FE");
+        assertThat(query.getQuery().toString()).containsSubsequence("filter", "term", "sector", "FE");
     }
 
-    @DisplayName("Topics 필터를 AND조건으로 추가하면 Filter 조건 안에 Term쿼리로 각 토픽을 추가한다.")
+    @DisplayName("topics AND filter를 추가한다")
     @Test
-    void withTopicsAndMatch_addsFilter() {
+    void withTopicsAndMatchAddsFilter() {
         NativeQuery query = new ESArticleQueryBuilder()
                 .withTopicsAndMatch(List.of(Topic.DATABASE, Topic.API_DESIGN))
                 .build();
@@ -72,9 +69,9 @@ class ESArticleQueryBuilderTest {
                 .containsSubsequence("filter", "term", "topics", "DATABASE", "term", "topics", "API_DESIGN");
     }
 
-    @DisplayName("Topics 필터를 OR조건으로 추가하면 Filter - Should 조건 안에 Term쿼리로 각 토픽을 추가한다.")
+    @DisplayName("topics OR filter를 추가한다")
     @Test
-    void withTopicsORMatch_addsFilter() {
+    void withTopicsOrMatchAddsFilter() {
         NativeQuery query = new ESArticleQueryBuilder()
                 .withTopicsOrMatch(List.of(Topic.DATABASE, Topic.API_DESIGN))
                 .build();
@@ -83,11 +80,11 @@ class ESArticleQueryBuilderTest {
                 .containsSubsequence("filter", "should", "term", "topics", "DATABASE", "term", "topics", "API_DESIGN");
     }
 
-    @DisplayName("Pagination을 설정한다.")
+    @DisplayName("pagination과 정렬을 함께 설정한다")
     @Test
-    void withPagination_and_Sort() {
+    void withPaginationAndSort() {
         NativeQuery query = new ESArticleQueryBuilder()
-                .withPagination(20, new ArticleCursor(100, 10L), ArticleSortType.CLICKS)
+                .withPagination(20, new CursorToken("100", 10L), ArticleSortType.CLICKS)
                 .withSort(ArticleSortType.CLICKS)
                 .build();
 
@@ -97,13 +94,13 @@ class ESArticleQueryBuilderTest {
         assertAll(
                 () -> assertThat(pageable.getPageSize()).isEqualTo(20),
                 () -> assertThat(sort.getOrderFor("clicks")).isNotNull(),
-                () -> assertThat(query.getSearchAfter()).contains(10L) // ES 쿼리 내부적으로는 ID만 있어도 된다고 함.
+                () -> assertThat(query.getSearchAfter()).contains(100L, 10L)
         );
     }
 
-    @DisplayName("정렬 타입이 RELEVANCE일 경우 score를 추적하고 _score 정렬이 포함된다.")
+    @DisplayName("relevance 정렬이면 score 추적을 활성화한다")
     @Test
-    void relevance_sort_enablesTrackScores() {
+    void relevanceSortEnablesTrackScores() {
         NativeQuery query = new ESArticleQueryBuilder()
                 .withSort(ArticleSortType.RELEVANCE)
                 .build();
@@ -114,18 +111,18 @@ class ESArticleQueryBuilderTest {
         );
     }
 
-    @DisplayName("ArticleQueryCondition으로 전체 조건을 조합할 수 있다.")
+    @DisplayName("ArticleQueryCondition 전체를 조합해 query를 만든다")
     @Test
-    void withQueryCondition_combinesAll() {
+    void withQueryConditionCombinesAll() {
         NativeQuery query = new ESArticleQueryBuilder()
                 .withQueryCondition(new ArticleQueryCondition(
-                        new SearchKeyword("테스트"),            // search
-                        Sector.BE,                                  // sector
-                        List.of(Topic.DATABASE),                    // topics
-                        List.of("mysql"),                       // techStacks
-                        ArticleSortType.CLICKS,                     // sort
-                        10,                                         // limit
-                        new ArticleCursor(10.0, 5L)  // cursor
+                        new SearchKeyword("테스트"),
+                        Sector.BE,
+                        List.of(Topic.DATABASE),
+                        List.of("mysql"),
+                        ArticleSortType.CLICKS,
+                        10,
+                        "10_5"
                 ))
                 .build();
 
@@ -135,7 +132,7 @@ class ESArticleQueryBuilderTest {
                 () -> assertThat(queryString).contains("filter", "term", "topics", "DATABASE"),
                 () -> assertThat(queryString).contains("filter", "term", "techStacks", "mysql"),
                 () -> assertThat(query.getSort().getOrderFor("clicks")).isNotNull(),
-                () -> assertThat(query.getSearchAfter()).contains(10.0, 5L)
+                () -> assertThat(query.getSearchAfter()).contains(10L, 5L)
         );
     }
 }

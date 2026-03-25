@@ -11,6 +11,7 @@ import java.util.List;
 import moaon.backend.article.application.dto.ArticleQueryCondition;
 import moaon.backend.article.domain.Article;
 import moaon.backend.article.domain.ArticleDocument;
+import moaon.backend.article.infrastructure.sort.CreatedAtArticleSortSpec;
 import moaon.backend.article.repository.db.ArticleDBRepository;
 import moaon.backend.article.repository.es.ArticleDocumentRepository;
 import moaon.backend.fixture.ArticleFixtureBuilder;
@@ -34,7 +35,7 @@ class ArticleRepositoryFacadeTest {
 
     private final ArticleQueryCondition queryCondition = new ArticleQueryConditionBuilder().sortBy(CREATED_AT).build();
 
-    @DisplayName("ElasticSearch Repository에서 먼저 검색한다")
+    @DisplayName("ElasticSearch Repository를 먼저 조회한다")
     @Test
     void getPagedArticlesElasticSearchFirst() {
         SearchHits<ArticleDocument> searchHits = mock(SearchHits.class);
@@ -42,15 +43,15 @@ class ArticleRepositoryFacadeTest {
         when(articleDocumentRepository.search(queryCondition)).thenReturn(searchHits);
         when(articleDBRepository.findAllById(List.of())).thenReturn(List.of());
 
-        ArticleSearchResult result = articleRepositoryFacade.search(queryCondition);
+        ArticleSearchResult result = articleRepositoryFacade.search(queryCondition, new CreatedAtArticleSortSpec(), null);
 
         assertThat(result.getArticles()).isEmpty();
         verify(articleDocumentRepository).search(queryCondition);
     }
 
-    @DisplayName("프로젝트 검색 시 프로젝트 ID 기반으로 ES를 호출한다")
+    @DisplayName("프로젝트 조회는 project id 기반으로 ES를 호출한다")
     @Test
-    void getByProjectId_success() {
+    void getByProjectIdSuccess() {
         long projectId = 1L;
         ProjectArticleQueryCondition pac = new ProjectArticleQueryCondition(
                 moaon.backend.article.domain.Sector.BE,
@@ -67,7 +68,7 @@ class ArticleRepositoryFacadeTest {
         when(articleDocumentRepository.searchInProject(eq(projectId), eq(pac.toArticleCondition()))).thenReturn(searchHits);
         when(articleDBRepository.findAllById(List.of(1L))).thenReturn(List.of(article));
 
-        ArticleSearchResult result = articleRepositoryFacade.searchInProject(projectId, pac);
+        ArticleSearchResult result = articleRepositoryFacade.searchInProject(projectId, pac, new CreatedAtArticleSortSpec(), null);
 
         assertThat(result.getArticles()).extracting(Article::getId).containsExactly(1L);
         verify(articleDocumentRepository).searchInProject(eq(projectId), eq(pac.toArticleCondition()));

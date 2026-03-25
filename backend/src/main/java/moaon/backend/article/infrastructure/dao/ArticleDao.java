@@ -18,12 +18,12 @@ import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import moaon.backend.article.domain.Article;
-import moaon.backend.article.domain.ArticleCursor;
-import moaon.backend.article.domain.ArticleSortType;
 import moaon.backend.article.domain.QArticle;
 import moaon.backend.article.domain.Sector;
 import moaon.backend.article.domain.Topic;
+import moaon.backend.article.infrastructure.sort.ArticleSortSpec;
 import moaon.backend.article.repository.db.ArticleFullTextSearchHQLFunction;
+import moaon.backend.global.cursor.CursorToken;
 import moaon.backend.global.domain.SearchKeyword;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
@@ -41,13 +41,13 @@ public class ArticleDao {
 
     public List<Article> findAllBy(
             Set<Long> ids,
-            ArticleCursor cursor,
+            CursorToken cursorToken,
             int limit,
-            ArticleSortType sortType,
+            ArticleSortSpec sortSpec,
             @Nullable SearchKeyword searchKeyword
     ) {
         if (searchKeyword != null && searchKeyword.hasValue()) {
-            return findAllWithScore(ids, cursor, limit, sortType, searchKeyword);
+            return findAllWithScore(ids, cursorToken, limit, sortSpec, searchKeyword);
         }
 
         return jpaQueryFactory
@@ -55,9 +55,9 @@ public class ArticleDao {
                 .from(article)
                 .where(
                         idIn(ids),
-                        cursorWhereClause(cursor, sortType, searchKeyword)
+                        sortSpec.getCursorPredicate(cursorToken, searchKeyword)
                 )
-                .orderBy(toOrderBy(sortType, searchKeyword))
+                .orderBy(sortSpec.getOrderSpecifiers(searchKeyword))
                 .limit(limit + FETCH_EXTRA_FOR_HAS_NEXT)
                 .fetch();
     }
@@ -158,17 +158,22 @@ public class ArticleDao {
                 .orElse(0L);
     }
 
-    private List<Article> findAllWithScore(Set<Long> ids, ArticleCursor cursor, int limit, ArticleSortType sortType,
-                                           SearchKeyword searchKeyword) {
+    private List<Article> findAllWithScore(
+            Set<Long> ids,
+            CursorToken cursorToken,
+            int limit,
+            ArticleSortSpec sortSpec,
+            SearchKeyword searchKeyword
+    ) {
         NumberTemplate<Double> score = ArticleFullTextSearchHQLFunction.scoreReference(searchKeyword);
         List<Tuple> tuples = jpaQueryFactory
                 .select(article, score)
                 .from(article)
                 .where(
                         idIn(ids),
-                        cursorWhereClause(cursor, sortType, searchKeyword)
+                        sortSpec.getCursorPredicate(cursorToken, searchKeyword)
                 )
-                .orderBy(toOrderBy(sortType, searchKeyword))
+                .orderBy(sortSpec.getOrderSpecifiers(searchKeyword))
                 .limit(limit + FETCH_EXTRA_FOR_HAS_NEXT)
                 .fetch();
 
@@ -194,15 +199,6 @@ public class ArticleDao {
         return article.sector.eq(sector);
     }
 
-    private BooleanExpression cursorWhereClause(ArticleCursor cursor, ArticleSortType sortType,
-                                                SearchKeyword searchKeyword) {
-        if (cursor == null) {
-            return null;
-        }
-
-        return CursorExpressionMapper.toWhereClause(cursor, sortType, searchKeyword);
-    }
-
     private BooleanExpression satisfiesMatchScore(SearchKeyword searchKeyword) {
         if (searchKeyword == null || !searchKeyword.hasValue()) {
             return null;
@@ -210,20 +206,5 @@ public class ArticleDao {
         return ArticleFullTextSearchHQLFunction
                 .scoreReference(searchKeyword)
                 .gt(MINIMUM_MATCH_SCORE);
-    }
-
-    private OrderSpecifier<?>[] toOrderBy(ArticleSortType sortBy, SearchKeyword searchKeyword) {
-        if (ArticleSortType.RELEVANCE == sortBy && searchKeyword != null && searchKeyword.hasValue()) {
-            NumberTemplate<Double> score = ArticleFullTextSearchHQLFunction.scoreReference(searchKeyword);
-            return new OrderSpecifier<?>[]{score.desc(), article.id.desc()};
-        }
-        if (ArticleSortType.CLICKS == sortBy) {
-            return new OrderSpecifier<?>[]{article.clicks.desc(), article.id.desc()};
-        }
-        if (ArticleSortType.CREATED_AT == sortBy) {
-            return new OrderSpecifier<?>[]{article.createdAt.desc(), article.id.desc()};
-        }
-
-        return new OrderSpecifier[]{};
     }
 }

@@ -13,10 +13,11 @@ import jakarta.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import moaon.backend.article.application.dto.ArticleQueryCondition;
-import moaon.backend.article.domain.ArticleCursor;
 import moaon.backend.article.domain.ArticleSortType;
 import moaon.backend.article.domain.Sector;
 import moaon.backend.article.domain.Topic;
+import moaon.backend.global.cursor.CursorCodec;
+import moaon.backend.global.cursor.CursorToken;
 import moaon.backend.global.domain.SearchKeyword;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -83,19 +84,19 @@ public class ESArticleQueryBuilder {
         return this;
     }
 
-    public ESArticleQueryBuilder withPagination(int limit, @Nullable ArticleCursor cursor, ArticleSortType sortType) {
-        if (cursor == null) {
+    public ESArticleQueryBuilder withPagination(int limit, @Nullable CursorToken cursorToken, ArticleSortType sortType) {
+        if (cursorToken == null) {
             limit = Math.max(limit, 1);
             this.pageable = PageRequest.of(0, limit);
             return this;
         }
         this.pageable = PageRequest.ofSize(limit);
-        if (ArticleSortType.CREATED_AT == sortType) {
-            this.searchAfter = List.of(cursor.getSortValueAsLong(), cursor.getLastId());
-            return this;
-        }
-
-        this.searchAfter = List.of(cursor.getSortValue(), cursor.getLastId());
+        Object sortValue = switch (sortType) {
+            case CLICKS -> Long.parseLong(cursorToken.sortValue());
+            case RELEVANCE -> Double.parseDouble(cursorToken.sortValue());
+            case CREATED_AT -> cursorToken.sortValue();
+        };
+        this.searchAfter = List.of(sortValue, cursorToken.lastId());
         return this;
     }
 
@@ -110,7 +111,7 @@ public class ESArticleQueryBuilder {
                 .withTechStacksAndMatch(condition.techStackNames())
                 .withTopicsAndMatch(condition.topics())
                 .withSort(condition.sortType())
-                .withPagination(condition.limit(), condition.cursor(), condition.sortType());
+                .withPagination(condition.limit(), CursorCodec.decode(condition.cursor()), condition.sortType());
     }
 
     public NativeQuery build() {

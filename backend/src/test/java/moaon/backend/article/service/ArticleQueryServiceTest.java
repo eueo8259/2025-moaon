@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import moaon.backend.article.application.ArticleQueryService;
+import moaon.backend.article.infrastructure.sort.ArticleSortSpecFactory;
 import moaon.backend.article.repository.ArticleRepositoryFacade;
 import moaon.backend.article.repository.db.ArticleDBRepository;
 import moaon.backend.global.exception.custom.CustomException;
@@ -20,16 +21,18 @@ class ArticleQueryServiceTest {
     private final ArticleRepositoryFacade articleRepositoryFacade = Mockito.mock(ArticleRepositoryFacade.class);
     private final ArticleDBRepository articleDBRepository = Mockito.mock(ArticleDBRepository.class);
     private final ProjectRepository projectRepository = Mockito.mock(ProjectRepository.class);
+    private final ArticleSortSpecFactory articleSortSpecFactory = Mockito.mock(ArticleSortSpecFactory.class);
 
     private final ArticleQueryService articleQueryService = new ArticleQueryService(
             articleRepositoryFacade,
             articleDBRepository,
-            projectRepository
+            projectRepository,
+            articleSortSpecFactory
     );
 
     @DisplayName("존재하지 않는 프로젝트 ID면 예외가 발생한다")
     @Test
-    void getByProjectId_notFound() {
+    void getByProjectIdNotFound() {
         when(projectRepository.existsById(123L)).thenReturn(false);
         ProjectArticleQueryCondition condition = mock(ProjectArticleQueryCondition.class);
 

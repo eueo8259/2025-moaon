@@ -9,7 +9,11 @@ import moaon.backend.article.domain.Article;
 import moaon.backend.article.domain.Sector;
 import moaon.backend.article.domain.Topic;
 import moaon.backend.article.infrastructure.dao.ArticleDao;
+import moaon.backend.article.infrastructure.sort.ArticleSortSpec;
+import moaon.backend.article.infrastructure.sort.ArticleSortSpecFactory;
 import moaon.backend.article.repository.ArticleSearchResult;
+import moaon.backend.global.cursor.CursorCodec;
+import moaon.backend.global.cursor.CursorToken;
 import moaon.backend.global.domain.SearchKeyword;
 import moaon.backend.global.query.FilteredIds;
 import moaon.backend.project.application.dto.ProjectArticleQueryCondition;
@@ -22,9 +26,27 @@ import org.springframework.util.CollectionUtils;
 public class CustomizedArticleRepositoryImpl implements CustomizedArticleRepository {
 
     private final ArticleDao articleDao;
+    private final ArticleSortSpecFactory articleSortSpecFactory;
+
+    public DBArticleSearchResult findWithSearchConditions(ArticleQueryCondition queryCondition) {
+        ArticleSortSpec sortSpec = articleSortSpecFactory.get(queryCondition.sortType());
+        CursorToken cursorToken = CursorCodec.decode(queryCondition.cursor());
+        return findWithSearchConditions(queryCondition, sortSpec, cursorToken);
+    }
+
+    public ArticleSearchResult findByProjectWithCondition(long projectId, ProjectArticleQueryCondition condition) {
+        ArticleQueryCondition articleQueryCondition = condition.toArticleCondition();
+        ArticleSortSpec sortSpec = articleSortSpecFactory.get(articleQueryCondition.sortType());
+        CursorToken cursorToken = CursorCodec.decode(articleQueryCondition.cursor());
+        return findByProjectWithCondition(projectId, condition, sortSpec, cursorToken);
+    }
 
     @Override
-    public DBArticleSearchResult findWithSearchConditions(ArticleQueryCondition queryCondition) {
+    public DBArticleSearchResult findWithSearchConditions(
+            ArticleQueryCondition queryCondition,
+            ArticleSortSpec sortSpec,
+            CursorToken cursorToken
+    ) {
         FilteredIds filteredIds = FilteredIds.init();
         filteredIds = applyTechStackFilter(filteredIds, queryCondition.techStackNames());
         filteredIds = applyTopicFilter(filteredIds, queryCondition.topics());
@@ -37,27 +59,33 @@ public class CustomizedArticleRepositoryImpl implements CustomizedArticleReposit
 
         List<Article> articles = articleDao.findAllBy(
                 filteredIds.getIds(),
-                queryCondition.cursor(),
+                cursorToken,
                 queryCondition.limit(),
-                queryCondition.sortType(),
+                sortSpec,
                 queryCondition.search()
         );
         long totalCount = calculateTotalCount(filteredIds);
-        return new DBArticleSearchResult(articles, totalCount, queryCondition.limit(), queryCondition.sortType());
+        return new DBArticleSearchResult(articles, totalCount, queryCondition.limit(), queryCondition.sortType(), sortSpec);
     }
 
     @Override
-    public ArticleSearchResult findByProjectWithCondition(long projectId, ProjectArticleQueryCondition condition) {
+    public ArticleSearchResult findByProjectWithCondition(
+            long projectId,
+            ProjectArticleQueryCondition condition,
+            ArticleSortSpec sortSpec,
+            CursorToken cursorToken
+    ) {
         List<Article> articles = findAllByProjectIdAndCondition(projectId, condition);
         return new DBArticleSearchResult(
                 articles,
                 articles.size(),
                 articles.size(),
-                condition.toArticleCondition().sortType()
+                condition.toArticleCondition().sortType(),
+                sortSpec
         );
     }
 
-    List<Article> findAllByProjectIdAndCondition(long id, ProjectArticleQueryCondition condition) {
+    private List<Article> findAllByProjectIdAndCondition(long id, ProjectArticleQueryCondition condition) {
         return articleDao.findAllBy(
                 id,
                 condition.sector(),

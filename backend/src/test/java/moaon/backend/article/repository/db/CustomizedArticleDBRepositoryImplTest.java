@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import moaon.backend.article.application.dto.ArticleQueryCondition;
 import moaon.backend.article.domain.Article;
-import moaon.backend.article.domain.ArticleCursor;
 import moaon.backend.article.domain.ArticleSortType;
 import moaon.backend.article.domain.Sector;
 import moaon.backend.article.domain.Topic;
@@ -17,6 +16,7 @@ import moaon.backend.fixture.Fixture;
 import moaon.backend.fixture.ProjectArticleQueryConditionFixtureBuilder;
 import moaon.backend.fixture.ProjectFixtureBuilder;
 import moaon.backend.fixture.RepositoryHelper;
+import moaon.backend.global.cursor.CursorToken;
 import moaon.backend.project.application.dto.ProjectArticleQueryCondition;
 import moaon.backend.project.domain.Project;
 import moaon.backend.techstack.domain.TechStack;
@@ -388,7 +388,7 @@ class CustomizedArticleDBRepositoryImplTest {
 
             ArticleQueryCondition queryCondition = new ArticleQueryConditionBuilder()
                     .sortBy(ArticleSortType.CREATED_AT)
-                    .cursor(new ArticleCursor(LocalDateTime.of(2024, 7, 31, 10, 0), 1L))
+                    .cursor(new CursorToken(LocalDateTime.of(2024, 7, 31, 10, 0).toString(), 1L))
                     .build();
 
             // when
@@ -434,7 +434,7 @@ class CustomizedArticleDBRepositoryImplTest {
 
             ArticleQueryCondition queryCondition = new ArticleQueryConditionBuilder()
                     .sortBy(ArticleSortType.CLICKS)
-                    .cursor(new ArticleCursor(4, 4L))
+                    .cursor(new CursorToken("4", 4L))
                     .build();
 
             // when

@@ -1,7 +1,6 @@
 package moaon.backend.article.application.dto;
 
 import java.util.List;
-import moaon.backend.article.domain.ArticleCursor;
 import moaon.backend.article.repository.ArticleSearchResult;
 
 public record ArticleResponse(
@@ -16,14 +15,7 @@ public record ArticleResponse(
                 ArticleData.from(searchResult.getArticles()),
                 (int) searchResult.getTotalCount(),
                 searchResult.hasNext(),
-                nextCursorToString(searchResult.getNextCursor())
+                searchResult.getNextCursor()
         );
-    }
-
-    private static String nextCursorToString(ArticleCursor nextCursor) {
-        if (nextCursor == null) {
-            return null;
-        }
-        return nextCursor.toString();
     }
 }
