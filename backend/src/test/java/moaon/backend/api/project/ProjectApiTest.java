@@ -40,7 +40,7 @@ import moaon.backend.project.application.dto.ProjectCreateResponse;
 import moaon.backend.project.application.dto.ProjectDetailResponse;
 import moaon.backend.project.domain.Category;
 import moaon.backend.project.domain.Project;
-import moaon.backend.techStack.domain.TechStack;
+import moaon.backend.shared.domain.TechStack;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

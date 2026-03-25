@@ -9,7 +9,7 @@ import moaon.backend.member.domain.Member;
 import moaon.backend.project.domain.Category;
 import moaon.backend.project.domain.Images;
 import moaon.backend.project.domain.Project;
-import moaon.backend.techStack.domain.TechStack;
+import moaon.backend.shared.domain.TechStack;
 
 public class ProjectFixtureBuilder {
 

@@ -5,8 +5,8 @@ import java.util.List;
 import moaon.backend.project.domain.Category;
 import moaon.backend.project.domain.Project;
 import moaon.backend.project.domain.ProjectCategory;
-import moaon.backend.techStack.domain.ProjectTechStack;
-import moaon.backend.techStack.domain.TechStack;
+import moaon.backend.project.domain.ProjectTechStack;
+import moaon.backend.shared.domain.TechStack;
 
 public record ProjectDetailResponse(
         long id,

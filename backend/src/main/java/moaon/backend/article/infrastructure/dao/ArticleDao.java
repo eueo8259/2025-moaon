@@ -1,8 +1,8 @@
 package moaon.backend.article.infrastructure.dao;
 
 import static moaon.backend.article.domain.QArticle.article;
-import static moaon.backend.techStack.domain.QArticleTechStack.articleTechStack;
-import static moaon.backend.techStack.domain.QTechStack.techStack;
+import static moaon.backend.article.domain.QArticleTechStack.articleTechStack;
+import static moaon.backend.shared.domain.QTechStack.techStack;
 
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.OrderSpecifier;

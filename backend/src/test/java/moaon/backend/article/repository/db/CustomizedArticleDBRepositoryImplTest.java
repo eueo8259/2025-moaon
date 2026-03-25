@@ -22,7 +22,7 @@ import moaon.backend.global.config.QueryDslConfig;
 import moaon.backend.project.application.dto.ProjectArticleQueryCondition;
 import moaon.backend.project.domain.Project;
 import moaon.backend.project.infrastructure.dao.ProjectDao;
-import moaon.backend.techStack.domain.TechStack;
+import moaon.backend.shared.domain.TechStack;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

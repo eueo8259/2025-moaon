@@ -8,7 +8,7 @@ import moaon.backend.article.domain.Article;
 import moaon.backend.article.domain.Sector;
 import moaon.backend.article.domain.Topic;
 import moaon.backend.project.domain.Project;
-import moaon.backend.techStack.domain.TechStack;
+import moaon.backend.shared.domain.TechStack;
 
 public class ArticleFixtureBuilder {
 

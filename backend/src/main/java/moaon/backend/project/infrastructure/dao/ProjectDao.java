@@ -4,8 +4,8 @@ import static moaon.backend.member.domain.QMember.member;
 import static moaon.backend.project.domain.QCategory.category;
 import static moaon.backend.project.domain.QProject.project;
 import static moaon.backend.project.domain.QProjectCategory.projectCategory;
-import static moaon.backend.techStack.domain.QProjectTechStack.projectTechStack;
-import static moaon.backend.techStack.domain.QTechStack.techStack;
+import static moaon.backend.project.domain.QProjectTechStack.projectTechStack;
+import static moaon.backend.shared.domain.QTechStack.techStack;
 
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -26,9 +26,9 @@ import moaon.backend.project.application.dto.ProjectQueryCondition;
 import moaon.backend.project.domain.Project;
 import moaon.backend.project.domain.ProjectCategory;
 import moaon.backend.project.domain.ProjectSortType;
+import moaon.backend.project.domain.ProjectTechStack;
 import moaon.backend.project.infrastructure.FilteringIds;
 import moaon.backend.project.infrastructure.ProjectFullTextSearchHQLFunction;
-import moaon.backend.techStack.domain.ProjectTechStack;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 

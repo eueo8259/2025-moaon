@@ -13,7 +13,7 @@ import moaon.backend.fixture.Fixture;
 import moaon.backend.global.exception.custom.CustomException;
 import moaon.backend.global.exception.custom.ErrorCode;
 import moaon.backend.member.domain.Member;
-import moaon.backend.techStack.domain.TechStack;
+import moaon.backend.shared.domain.TechStack;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

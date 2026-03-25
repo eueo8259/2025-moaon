@@ -2,7 +2,7 @@ package moaon.backend.project.application.dto;
 
 import java.util.List;
 import moaon.backend.project.domain.Project;
-import moaon.backend.techStack.domain.TechStack;
+import moaon.backend.shared.domain.TechStack;
 
 public record ProjectSummaryResponse(
         Long id,

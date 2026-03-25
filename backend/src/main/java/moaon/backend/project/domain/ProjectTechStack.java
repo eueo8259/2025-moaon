@@ -1,4 +1,4 @@
-package moaon.backend.techStack.domain;
+package moaon.backend.project.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import moaon.backend.project.domain.Project;
+import moaon.backend.shared.domain.TechStack;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

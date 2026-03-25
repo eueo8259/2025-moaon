@@ -4,8 +4,8 @@ import java.util.List;
 import moaon.backend.project.application.dto.ProjectQueryCondition;
 import moaon.backend.project.domain.Project;
 import moaon.backend.project.domain.ProjectCategory;
+import moaon.backend.project.domain.ProjectTechStack;
 import moaon.backend.project.domain.Projects;
-import moaon.backend.techStack.domain.ProjectTechStack;
 
 public interface CustomizedProjectRepository {
 

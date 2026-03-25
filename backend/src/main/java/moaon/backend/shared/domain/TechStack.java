@@ -1,4 +1,4 @@
-package moaon.backend.techStack.domain;
+package moaon.backend.shared.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,6 +13,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import moaon.backend.article.domain.ArticleTechStack;
+import moaon.backend.project.domain.ProjectTechStack;
 import org.hibernate.annotations.BatchSize;
 
 @Entity

@@ -12,7 +12,7 @@ import moaon.backend.project.domain.ProjectCategory;
 import moaon.backend.project.domain.Projects;
 import moaon.backend.project.domain.repository.CustomizedProjectRepository;
 import moaon.backend.project.infrastructure.dao.ProjectDao;
-import moaon.backend.techStack.domain.ProjectTechStack;
+import moaon.backend.project.domain.ProjectTechStack;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 

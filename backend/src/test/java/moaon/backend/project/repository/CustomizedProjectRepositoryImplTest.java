@@ -17,7 +17,7 @@ import moaon.backend.project.domain.ProjectSortType;
 import moaon.backend.project.domain.Projects;
 import moaon.backend.project.infrastructure.CustomizedProjectRepositoryImpl;
 import moaon.backend.project.infrastructure.dao.ProjectDao;
-import moaon.backend.techStack.domain.TechStack;
+import moaon.backend.shared.domain.TechStack;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

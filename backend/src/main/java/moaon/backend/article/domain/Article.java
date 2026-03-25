@@ -30,8 +30,7 @@ import moaon.backend.global.domain.BaseTimeEntity;
 import moaon.backend.global.exception.custom.CustomException;
 import moaon.backend.global.exception.custom.ErrorCode;
 import moaon.backend.project.domain.Project;
-import moaon.backend.techStack.domain.ArticleTechStack;
-import moaon.backend.techStack.domain.TechStack;
+import moaon.backend.shared.domain.TechStack;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
