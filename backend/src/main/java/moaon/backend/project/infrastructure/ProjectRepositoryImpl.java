@@ -6,6 +6,7 @@ import moaon.backend.global.cursor.CursorToken;
 import moaon.backend.global.domain.SearchKeyword;
 import moaon.backend.global.exception.custom.CustomException;
 import moaon.backend.global.exception.custom.ErrorCode;
+import moaon.backend.global.query.FilteredIds;
 import moaon.backend.project.application.dto.ProjectQueryCondition;
 import moaon.backend.project.application.repository.ProjectQueryRepository;
 import moaon.backend.project.domain.Project;
@@ -56,17 +57,17 @@ public class ProjectRepositoryImpl implements ProjectRepository, ProjectQueryRep
         SearchKeyword search = condition.search();
         List<String> categoryNames = condition.categoryNames();
 
-        FilteringIds filteringIds = FilteringIds.init();
-        filteringIds = applyTechStacks(filteringIds, techStackNames);
-        filteringIds = applyCategories(filteringIds, categoryNames);
-        filteringIds = applySearch(filteringIds, search);
+        FilteredIds filteredIds = FilteredIds.init();
+        filteredIds = applyTechStacks(filteredIds, techStackNames);
+        filteredIds = applyCategories(filteredIds, categoryNames);
+        filteredIds = applySearch(filteredIds, search);
 
-        if (filteringIds.hasEmptyResult()) {
+        if (filteredIds.hasEmptyResult()) {
             return Projects.empty(limit);
         }
 
-        List<Project> projects = projectDao.findProjects(condition, filteringIds.getIds(), sortSpec, cursorToken);
-        return new Projects(projects, calculateTotalCount(filteringIds), limit);
+        List<Project> projects = projectDao.findProjects(condition, filteredIds.getIds(), sortSpec, cursorToken);
+        return new Projects(projects, calculateTotalCount(filteredIds), limit);
     }
 
     @Override
@@ -85,38 +86,38 @@ public class ProjectRepositoryImpl implements ProjectRepository, ProjectQueryRep
                 .orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NOT_FOUND));
     }
 
-    private FilteringIds applyTechStacks(FilteringIds filteringIds, List<String> techStack) {
-        if (filteringIds.hasEmptyResult() || CollectionUtils.isEmpty(techStack)) {
-            return filteringIds;
+    private FilteredIds applyTechStacks(FilteredIds filteredIds, List<String> techStack) {
+        if (filteredIds.hasEmptyResult() || CollectionUtils.isEmpty(techStack)) {
+            return filteredIds;
         }
 
-        java.util.Set<Long> projectIdsByTechStacks = projectDao.findProjectIdsByTechStacks(filteringIds, techStack);
-        return filteringIds.addFilterResult(projectIdsByTechStacks);
+        java.util.Set<Long> projectIdsByTechStacks = projectDao.findProjectIdsByTechStacks(filteredIds, techStack);
+        return filteredIds.addFilterResult(projectIdsByTechStacks);
     }
 
-    private FilteringIds applyCategories(FilteringIds filteringIds, List<String> categories) {
-        if (filteringIds.hasEmptyResult() || CollectionUtils.isEmpty(categories)) {
-            return filteringIds;
+    private FilteredIds applyCategories(FilteredIds filteredIds, List<String> categories) {
+        if (filteredIds.hasEmptyResult() || CollectionUtils.isEmpty(categories)) {
+            return filteredIds;
         }
 
-        java.util.Set<Long> projectIdsByCategories = projectDao.findProjectIdsByCategories(filteringIds, categories);
-        return filteringIds.addFilterResult(projectIdsByCategories);
+        java.util.Set<Long> projectIdsByCategories = projectDao.findProjectIdsByCategories(filteredIds, categories);
+        return filteredIds.addFilterResult(projectIdsByCategories);
     }
 
-    private FilteringIds applySearch(FilteringIds filteringIds, SearchKeyword keyword) {
-        if (filteringIds.hasEmptyResult() || keyword == null || !keyword.hasValue()) {
-            return filteringIds;
+    private FilteredIds applySearch(FilteredIds filteredIds, SearchKeyword keyword) {
+        if (filteredIds.hasEmptyResult() || keyword == null || !keyword.hasValue()) {
+            return filteredIds;
         }
 
-        java.util.Set<Long> projectIdsBySearchKeyword = projectDao.findProjectIdsBySearchKeyword(filteringIds, keyword);
-        return filteringIds.addFilterResult(projectIdsBySearchKeyword);
+        java.util.Set<Long> projectIdsBySearchKeyword = projectDao.findProjectIdsBySearchKeyword(filteredIds, keyword);
+        return filteredIds.addFilterResult(projectIdsBySearchKeyword);
     }
 
-    private long calculateTotalCount(FilteringIds filteringIds) {
-        if (filteringIds.isEmpty()) {
+    private long calculateTotalCount(FilteredIds filteredIds) {
+        if (filteredIds.isEmpty()) {
             return projectDao.count();
         }
 
-        return filteringIds.size();
+        return filteredIds.size();
     }
 }

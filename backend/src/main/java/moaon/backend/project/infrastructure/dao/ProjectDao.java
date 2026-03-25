@@ -24,11 +24,11 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import moaon.backend.global.cursor.CursorToken;
 import moaon.backend.global.domain.SearchKeyword;
+import moaon.backend.global.query.FilteredIds;
 import moaon.backend.project.application.dto.ProjectQueryCondition;
 import moaon.backend.project.domain.Project;
 import moaon.backend.project.domain.ProjectCategory;
 import moaon.backend.project.domain.ProjectTechStack;
-import moaon.backend.project.infrastructure.FilteringIds;
 import moaon.backend.project.infrastructure.ProjectFullTextSearchHQLFunction;
 import moaon.backend.project.infrastructure.sort.ProjectSortSpec;
 import org.springframework.stereotype.Repository;
@@ -110,7 +110,7 @@ public class ProjectDao {
                 .fetch();
     }
 
-    public Set<Long> findProjectIdsByTechStacks(FilteringIds filteringIds, List<String> techStacks) {
+    public Set<Long> findProjectIdsByTechStacks(FilteredIds filteredIds, List<String> techStacks) {
         if (CollectionUtils.isEmpty(techStacks)) {
             return new HashSet<>();
         }
@@ -119,14 +119,14 @@ public class ProjectDao {
                 .from(projectTechStack)
                 .where(
                         projectTechStack.techStack.name.in(techStacks),
-                        projectIdInFilteringIds(filteringIds, projectTechStack.project.id)
+                        projectIdInFilteringIds(filteredIds, projectTechStack.project.id)
                 )
                 .groupBy(projectTechStack.project.id)
                 .having(projectTechStack.techStack.name.count().eq((long) techStacks.size()))
                 .fetch());
     }
 
-    public Set<Long> findProjectIdsByCategories(FilteringIds filteringIds, List<String> categories) {
+    public Set<Long> findProjectIdsByCategories(FilteredIds filteredIds, List<String> categories) {
         if (CollectionUtils.isEmpty(categories)) {
             return new HashSet<>();
         }
@@ -135,14 +135,14 @@ public class ProjectDao {
                 .from(projectCategory)
                 .where(
                         projectCategory.category.name.in(categories),
-                        projectIdInFilteringIds(filteringIds, projectCategory.project.id)
+                        projectIdInFilteringIds(filteredIds, projectCategory.project.id)
                 )
                 .groupBy(projectCategory.project.id)
                 .having(projectCategory.category.name.count().eq((long) categories.size()))
                 .fetch());
     }
 
-    public Set<Long> findProjectIdsBySearchKeyword(FilteringIds filteringIds, SearchKeyword searchKeyword) {
+    public Set<Long> findProjectIdsBySearchKeyword(FilteredIds filteredIds, SearchKeyword searchKeyword) {
         if (searchKeyword == null || !searchKeyword.hasValue()) {
             return new HashSet<>();
         }
@@ -151,7 +151,7 @@ public class ProjectDao {
                 .from(project)
                 .where(
                         satisfiesMatchScore(searchKeyword),
-                        projectIdInFilteringIds(filteringIds, project.id)
+                        projectIdInFilteringIds(filteredIds, project.id)
                 )
                 .fetch());
     }
@@ -172,11 +172,11 @@ public class ProjectDao {
     }
 
     private BooleanExpression projectIdInFilteringIds(
-            FilteringIds filteringIds,
+            FilteredIds filteredIds,
             SimpleExpression<Long> projectIdExpression
     ) {
-        if (filteringIds.isHasResult()) {
-            return projectIdExpression.in(filteringIds.getIds());
+        if (filteredIds.hasResult()) {
+            return projectIdExpression.in(filteredIds.getIds());
         }
 
         return null;
