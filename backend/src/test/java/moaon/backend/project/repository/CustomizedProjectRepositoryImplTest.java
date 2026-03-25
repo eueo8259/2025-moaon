@@ -10,13 +10,13 @@ import moaon.backend.fixture.ProjectQueryConditionFixtureBuilder;
 import moaon.backend.fixture.RepositoryHelper;
 import moaon.backend.global.cursor.CursorCodec;
 import moaon.backend.global.config.QueryDslConfig;
+import moaon.backend.project.application.repository.ProjectQueryRepository;
 import moaon.backend.member.domain.Member;
 import moaon.backend.project.application.dto.ProjectQueryCondition;
 import moaon.backend.project.domain.Category;
 import moaon.backend.project.domain.Project;
 import moaon.backend.project.domain.ProjectSortType;
 import moaon.backend.project.domain.Projects;
-import moaon.backend.project.infrastructure.CustomizedProjectRepositoryImpl;
 import moaon.backend.project.infrastructure.dao.ProjectDao;
 import moaon.backend.project.infrastructure.sort.ProjectSortSpecFactory;
 import moaon.backend.shared.domain.TechStack;
@@ -33,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 class CustomizedProjectRepositoryImplTest {
 
     @Autowired
-    private CustomizedProjectRepositoryImpl customizedProjectRepositoryImpl;
+    private ProjectQueryRepository projectQueryRepository;
 
     @Autowired
     private RepositoryHelper repositoryHelper;
@@ -42,7 +42,7 @@ class CustomizedProjectRepositoryImplTest {
     private ProjectSortSpecFactory projectSortSpecFactory;
 
     private Projects findProjects(ProjectQueryCondition queryCondition) {
-        return customizedProjectRepositoryImpl.findWithSearchConditions(
+        return projectQueryRepository.findWithSearchConditions(
                 queryCondition,
                 projectSortSpecFactory.get(queryCondition.projectSortType()),
                 CursorCodec.decode(queryCondition.cursor())

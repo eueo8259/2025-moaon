@@ -10,6 +10,7 @@ import moaon.backend.member.application.MemberService;
 import moaon.backend.member.domain.Member;
 import moaon.backend.project.application.dto.ProjectCreateRequest;
 import moaon.backend.project.application.dto.ProjectDetailResponse;
+import moaon.backend.project.application.repository.ProjectQueryRepository;
 import moaon.backend.project.domain.Images;
 import moaon.backend.project.domain.Project;
 import moaon.backend.project.domain.ProjectCategory;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProjectCommandService {
 
     private final ProjectRepository projectRepository;
+    private final ProjectQueryRepository projectQueryRepository;
     private final MemberService memberService;
     private final TechStackRepository techStackRepository;
     private final CategoryRepository categoryRepository;
@@ -40,9 +42,9 @@ public class ProjectCommandService {
 
     public ProjectDetailResponse increaseViewsCount(long id) {
         projectRepository.increaseViewCountById(id);
-        Project project = projectRepository.findProjectWithMemberJoin(id);
-        List<ProjectTechStack> stacks = projectRepository.findProjectTechStacksByProjectId(id);
-        List<ProjectCategory> categories = projectRepository.findProjectCategoriesByProjectId(id);
+        Project project = projectQueryRepository.findProjectWithMemberJoin(id);
+        List<ProjectTechStack> stacks = projectQueryRepository.findProjectTechStacksByProjectId(id);
+        List<ProjectCategory> categories = projectQueryRepository.findProjectCategoriesByProjectId(id);
 
         return ProjectDetailResponse.from(project, stacks, categories);
     }

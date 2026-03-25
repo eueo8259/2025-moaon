@@ -1,4 +1,4 @@
-package moaon.backend.project.domain.repository;
+package moaon.backend.project.application.repository;
 
 import java.util.List;
 import moaon.backend.global.cursor.CursorToken;
@@ -9,7 +9,7 @@ import moaon.backend.project.domain.ProjectTechStack;
 import moaon.backend.project.domain.Projects;
 import moaon.backend.project.infrastructure.sort.ProjectSortSpec;
 
-public interface CustomizedProjectRepository {
+public interface ProjectQueryRepository {
 
     Projects findWithSearchConditions(
             ProjectQueryCondition projectQueryCondition,
@@ -18,8 +18,6 @@ public interface CustomizedProjectRepository {
     );
 
     Project findProjectWithMemberJoin(Long id);
-
-    void increaseViewCountById(Long id);
 
     List<ProjectCategory> findProjectCategoriesByProjectId(Long id);
 

@@ -8,9 +8,9 @@ import moaon.backend.fixture.ProjectFixtureBuilder;
 import moaon.backend.fixture.ProjectQueryConditionFixtureBuilder;
 import moaon.backend.fixture.RepositoryHelper;
 import moaon.backend.global.cursor.CursorCodec;
+import moaon.backend.project.application.repository.ProjectQueryRepository;
 import moaon.backend.project.application.dto.ProjectQueryCondition;
 import moaon.backend.project.domain.Project;
-import moaon.backend.project.infrastructure.CustomizedProjectRepositoryImpl;
 import moaon.backend.project.infrastructure.dao.ProjectDao;
 import moaon.backend.project.infrastructure.sort.ProjectSortSpecFactory;
 import org.junit.jupiter.api.DisplayName;
@@ -26,7 +26,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 public class ProjectRepositorySearchTest {
 
     @Autowired
-    private CustomizedProjectRepositoryImpl repository;
+    private ProjectQueryRepository repository;
 
     @Autowired
     private RepositoryHelper repositoryHelper;

@@ -12,11 +12,11 @@ import moaon.backend.global.exception.custom.ErrorCode;
 import moaon.backend.project.application.ProjectQueryService;
 import moaon.backend.project.application.dto.PagedProjectResponse;
 import moaon.backend.project.application.dto.ProjectQueryCondition;
+import moaon.backend.project.application.repository.ProjectQueryRepository;
 import moaon.backend.project.application.dto.ProjectSummaryResponse;
 import moaon.backend.project.domain.Project;
 import moaon.backend.project.domain.ProjectSortType;
 import moaon.backend.project.domain.Projects;
-import moaon.backend.project.domain.repository.ProjectRepository;
 import moaon.backend.project.infrastructure.sort.ProjectSortSpec;
 import moaon.backend.project.infrastructure.sort.ProjectSortSpecFactory;
 import org.junit.jupiter.api.Disabled;
@@ -32,7 +32,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class ProjectQueryServiceTest {
 
     @Mock
-    private ProjectRepository projectRepository;
+    private ProjectQueryRepository projectQueryRepository;
 
     @Mock
     private ProjectSortSpecFactory projectSortSpecFactory;
@@ -76,7 +76,7 @@ class ProjectQueryServiceTest {
         );
 
         Mockito.when(projectSortSpecFactory.get(ProjectSortType.CREATED_AT)).thenReturn(projectSortSpec);
-        Mockito.when(projectRepository.findWithSearchConditions(eq(projectQueryCondition), eq(projectSortSpec), eq(null)))
+        Mockito.when(projectQueryRepository.findWithSearchConditions(eq(projectQueryCondition), eq(projectSortSpec), eq(null)))
                 .thenReturn(new Projects(projects, 5, projectQueryCondition.limit()));
         Mockito.when(projectSortSpec.createNextCursor(project2)).thenReturn("next-cursor");
 
@@ -118,7 +118,7 @@ class ProjectQueryServiceTest {
         );
 
         Mockito.when(projectSortSpecFactory.get(ProjectSortType.CREATED_AT)).thenReturn(projectSortSpec);
-        Mockito.when(projectRepository.findWithSearchConditions(eq(projectQueryCondition), eq(projectSortSpec), eq(null)))
+        Mockito.when(projectQueryRepository.findWithSearchConditions(eq(projectQueryCondition), eq(projectSortSpec), eq(null)))
                 .thenReturn(new Projects(projects, 3, projectQueryCondition.limit()));
 
         ProjectSummaryResponse projectSummaryResponse1 = ProjectSummaryResponse.from(project1);

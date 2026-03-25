@@ -1,28 +1,49 @@
 package moaon.backend.project.infrastructure;
 
 import java.util.List;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import moaon.backend.global.cursor.CursorToken;
 import moaon.backend.global.domain.SearchKeyword;
 import moaon.backend.global.exception.custom.CustomException;
 import moaon.backend.global.exception.custom.ErrorCode;
 import moaon.backend.project.application.dto.ProjectQueryCondition;
+import moaon.backend.project.application.repository.ProjectQueryRepository;
 import moaon.backend.project.domain.Project;
 import moaon.backend.project.domain.ProjectCategory;
-import moaon.backend.project.domain.Projects;
-import moaon.backend.project.domain.repository.CustomizedProjectRepository;
-import moaon.backend.project.infrastructure.dao.ProjectDao;
 import moaon.backend.project.domain.ProjectTechStack;
+import moaon.backend.project.domain.Projects;
+import moaon.backend.project.domain.repository.ProjectRepository;
+import moaon.backend.project.infrastructure.dao.ProjectDao;
 import moaon.backend.project.infrastructure.sort.ProjectSortSpec;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
 @Repository
 @RequiredArgsConstructor
-public class CustomizedProjectRepositoryImpl implements CustomizedProjectRepository {
+public class ProjectRepositoryImpl implements ProjectRepository, ProjectQueryRepository {
 
+    private final ProjectJpaRepository projectJpaRepository;
     private final ProjectDao projectDao;
+
+    @Override
+    public Project save(Project project) {
+        return projectJpaRepository.save(project);
+    }
+
+    @Override
+    public java.util.Optional<Project> findById(Long id) {
+        return projectJpaRepository.findById(id);
+    }
+
+    @Override
+    public boolean existsById(Long id) {
+        return projectJpaRepository.existsById(id);
+    }
+
+    @Override
+    public void increaseViewCountById(Long id) {
+        projectDao.increaseViewCountById(id);
+    }
 
     @Override
     public Projects findWithSearchConditions(
@@ -64,17 +85,12 @@ public class CustomizedProjectRepositoryImpl implements CustomizedProjectReposit
                 .orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NOT_FOUND));
     }
 
-    @Override
-    public void increaseViewCountById(Long id) {
-        projectDao.increaseViewCountById(id);
-    }
-
     private FilteringIds applyTechStacks(FilteringIds filteringIds, List<String> techStack) {
         if (filteringIds.hasEmptyResult() || CollectionUtils.isEmpty(techStack)) {
             return filteringIds;
         }
 
-        Set<Long> projectIdsByTechStacks = projectDao.findProjectIdsByTechStacks(filteringIds, techStack);
+        java.util.Set<Long> projectIdsByTechStacks = projectDao.findProjectIdsByTechStacks(filteringIds, techStack);
         return filteringIds.addFilterResult(projectIdsByTechStacks);
     }
 
@@ -83,7 +99,7 @@ public class CustomizedProjectRepositoryImpl implements CustomizedProjectReposit
             return filteringIds;
         }
 
-        Set<Long> projectIdsByCategories = projectDao.findProjectIdsByCategories(filteringIds, categories);
+        java.util.Set<Long> projectIdsByCategories = projectDao.findProjectIdsByCategories(filteringIds, categories);
         return filteringIds.addFilterResult(projectIdsByCategories);
     }
 
@@ -92,7 +108,7 @@ public class CustomizedProjectRepositoryImpl implements CustomizedProjectReposit
             return filteringIds;
         }
 
-        Set<Long> projectIdsBySearchKeyword = projectDao.findProjectIdsBySearchKeyword(filteringIds, keyword);
+        java.util.Set<Long> projectIdsBySearchKeyword = projectDao.findProjectIdsBySearchKeyword(filteringIds, keyword);
         return filteringIds.addFilterResult(projectIdsBySearchKeyword);
     }
 
