@@ -8,7 +8,8 @@ import java.util.List;
 import moaon.backend.article.application.ArticleQueryService;
 import moaon.backend.global.cookie.AccessHistory;
 import moaon.backend.global.cookie.TrackingCookieManager;
-import moaon.backend.project.application.ProjectService;
+import moaon.backend.project.application.ProjectCommandService;
+import moaon.backend.project.application.ProjectQueryService;
 import moaon.backend.project.application.dto.PagedProjectResponse;
 import moaon.backend.project.application.dto.ProjectArticleQueryCondition;
 import moaon.backend.project.application.dto.ProjectArticleResponse;
@@ -34,16 +35,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProjectController {
 
     private final TrackingCookieManager cookieManager;
-    private final ProjectService projectService;
+    private final ProjectCommandService projectCommandService;
+    private final ProjectQueryService projectQueryService;
     private final ArticleQueryService articleQueryService;
 
     public ProjectController(
             @Qualifier("projectViewCookieManager") TrackingCookieManager cookieManager,
-            ProjectService projectService,
+            ProjectCommandService projectCommandService,
+            ProjectQueryService projectQueryService,
             ArticleQueryService articleQueryService
     ) {
         this.cookieManager = cookieManager;
-        this.projectService = projectService;
+        this.projectCommandService = projectCommandService;
+        this.projectQueryService = projectQueryService;
         this.articleQueryService = articleQueryService;
     }
 
@@ -52,7 +56,7 @@ public class ProjectController {
             @CookieValue(value = "token", required = false) String token,
             @RequestBody @Valid ProjectCreateRequest projectCreateRequest
     ) {
-        Long savedId = projectService.save(token, projectCreateRequest);
+        Long savedId = projectCommandService.save(token, projectCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(ProjectCreateResponse.from(savedId));
     }
 
@@ -64,11 +68,11 @@ public class ProjectController {
     ) {
         AccessHistory accessHistory = cookieManager.extractViewedMap(request);
         if (cookieManager.isCountIncreasable(id, accessHistory)) {
-            ProjectDetailResponse projectDetailResponse = projectService.increaseViewsCount(id);
+            ProjectDetailResponse projectDetailResponse = projectCommandService.increaseViewsCount(id);
             cookieManager.createOrUpdateCookie(id, accessHistory, response);
             return ResponseEntity.ok(projectDetailResponse);
         }
-        return ResponseEntity.ok(projectService.getById(id));
+        return ResponseEntity.ok(projectQueryService.getById(id));
     }
 
     @GetMapping
@@ -82,7 +86,7 @@ public class ProjectController {
     ) {
         ProjectQueryCondition condition = ProjectQueryCondition.of(search, categories, techStacks, sortType, limit,
                 cursor);
-        return ResponseEntity.ok(projectService.getPagedProjects(condition));
+        return ResponseEntity.ok(projectQueryService.getPagedProjects(condition));
     }
 
     @GetMapping("/{id}/articles")

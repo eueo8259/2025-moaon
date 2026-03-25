@@ -4,69 +4,40 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import moaon.backend.global.cursor.CursorCodec;
-import moaon.backend.global.cursor.CursorToken;
 import moaon.backend.global.exception.custom.CustomException;
 import moaon.backend.global.exception.custom.ErrorCode;
 import moaon.backend.member.application.MemberService;
 import moaon.backend.member.domain.Member;
-import moaon.backend.project.application.dto.PagedProjectResponse;
 import moaon.backend.project.application.dto.ProjectCreateRequest;
 import moaon.backend.project.application.dto.ProjectDetailResponse;
-import moaon.backend.project.application.dto.ProjectQueryCondition;
 import moaon.backend.project.domain.Images;
 import moaon.backend.project.domain.Project;
 import moaon.backend.project.domain.ProjectCategory;
-import moaon.backend.project.domain.Projects;
+import moaon.backend.project.domain.ProjectTechStack;
 import moaon.backend.project.domain.repository.CategoryRepository;
 import moaon.backend.project.domain.repository.ProjectRepository;
-import moaon.backend.project.domain.ProjectTechStack;
 import moaon.backend.project.infrastructure.TechStackRepository;
-import moaon.backend.project.infrastructure.sort.ProjectSortSpec;
-import moaon.backend.project.infrastructure.sort.ProjectSortSpecFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
-@Transactional(readOnly = true)
+@Transactional
 @RequiredArgsConstructor
-public class ProjectService {
+public class ProjectCommandService {
 
     private final ProjectRepository projectRepository;
     private final MemberService memberService;
     private final TechStackRepository techStackRepository;
     private final CategoryRepository categoryRepository;
-    private final ProjectSortSpecFactory projectSortSpecFactory;
 
     @Value("${s3.region}")
     private String region;
+
     @Value("${s3.bucket}")
     private String bucket;
 
-    public ProjectDetailResponse getById(Long id) {
-        Project project = projectRepository.findProjectWithMemberJoin(id);
-        List<ProjectTechStack> stacks = projectRepository.findProjectTechStacksByProjectId(id);
-        List<ProjectCategory> categories = projectRepository.findProjectCategoriesByProjectId(id);
-
-        return ProjectDetailResponse.from(project, stacks, categories);
-    }
-
-    public PagedProjectResponse getPagedProjects(ProjectQueryCondition projectQueryCondition) {
-        CursorToken cursorToken = CursorCodec.decode(projectQueryCondition.cursor());
-        ProjectSortSpec sortSpec = projectSortSpecFactory.get(projectQueryCondition.projectSortType());
-        Projects projects = projectRepository.findWithSearchConditions(projectQueryCondition, sortSpec, cursorToken);
-
-        List<Project> projectsToReturn = projects.getProjectsToReturn();
-        long count = projects.getCount();
-        boolean hasNext = projects.hasNext();
-        String nextCursor = projects.getNextCursor(sortSpec);
-
-        return PagedProjectResponse.from(projectsToReturn, count, hasNext, nextCursor);
-    }
-
-    @Transactional
     public ProjectDetailResponse increaseViewsCount(long id) {
         projectRepository.increaseViewCountById(id);
         Project project = projectRepository.findProjectWithMemberJoin(id);
@@ -76,7 +47,6 @@ public class ProjectService {
         return ProjectDetailResponse.from(project, stacks, categories);
     }
 
-    @Transactional
     public Long save(String token, ProjectCreateRequest request) {
         Member member = memberService.getUserByToken(token);
         Project project = new Project(
@@ -88,16 +58,12 @@ public class ProjectService {
                 imagesFrom(request.imageKeys()),
                 member,
                 request.techStacks().stream()
-                        .map(
-                                techStack -> techStackRepository.findByName(techStack)
-                                        .orElseThrow(() -> new CustomException(ErrorCode.TECHSTACK_NOT_FOUND))
-                        )
+                        .map(techStack -> techStackRepository.findByName(techStack)
+                                .orElseThrow(() -> new CustomException(ErrorCode.TECHSTACK_NOT_FOUND)))
                         .toList(),
                 request.categories().stream()
-                        .map(
-                                category -> categoryRepository.findByName(category)
-                                        .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND))
-                        )
+                        .map(category -> categoryRepository.findByName(category)
+                                .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND)))
                         .toList(),
                 LocalDateTime.now()
         );
@@ -107,7 +73,6 @@ public class ProjectService {
     }
 
     private Images imagesFrom(List<String> imageKeys) {
-        // https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/moaon/projects/~~.png
         List<String> urls = imageKeys.stream()
                 .map(k -> String.format("https://%s.s3.%s.amazonaws.com/%s", bucket, region, k))
                 .toList();

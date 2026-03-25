@@ -1,19 +1,15 @@
 package moaon.backend.project.service;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 
 import java.util.List;
 import moaon.backend.fixture.ProjectFixtureBuilder;
-import moaon.backend.project.infrastructure.sort.ProjectSortSpec;
-import moaon.backend.project.infrastructure.sort.ProjectSortSpecFactory;
 import moaon.backend.global.exception.custom.CustomException;
 import moaon.backend.global.exception.custom.ErrorCode;
-import moaon.backend.project.application.ProjectService;
+import moaon.backend.project.application.ProjectQueryService;
 import moaon.backend.project.application.dto.PagedProjectResponse;
 import moaon.backend.project.application.dto.ProjectQueryCondition;
 import moaon.backend.project.application.dto.ProjectSummaryResponse;
@@ -21,6 +17,8 @@ import moaon.backend.project.domain.Project;
 import moaon.backend.project.domain.ProjectSortType;
 import moaon.backend.project.domain.Projects;
 import moaon.backend.project.domain.repository.ProjectRepository;
+import moaon.backend.project.infrastructure.sort.ProjectSortSpec;
+import moaon.backend.project.infrastructure.sort.ProjectSortSpecFactory;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,7 +29,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class ProjectServiceTest {
+class ProjectQueryServiceTest {
 
     @Mock
     private ProjectRepository projectRepository;
@@ -43,21 +41,20 @@ class ProjectServiceTest {
     private ProjectSortSpec projectSortSpec;
 
     @InjectMocks
-    private ProjectService projectService;
+    private ProjectQueryService projectQueryService;
 
     @Disabled
-    @DisplayName("ID에 해당하는 프로젝트가 존재하지 않는다면 예외가 발생한다.")
+    @DisplayName("ID에 해당하는 프로젝트가 존재하지 않으면 예외가 발생한다.")
     @Test
     void getProjectById() {
-        assertThatThrownBy(() -> projectService.getById(1L))
+        assertThatThrownBy(() -> projectQueryService.getById(1L))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(ErrorCode.PROJECT_NOT_FOUND.getMessage());
     }
 
-    @DisplayName("다음 아티클이 존재할 때 nextCursor를 포함하여 아티클을 리턴한다.")
+    @DisplayName("다음 페이지가 존재하면 nextCursor를 포함해 프로젝트를 반환한다.")
     @Test
-    void getPagedArticlesWhenHasNext() {
-        // given
+    void getPagedProjectsWhenHasNext() {
         Project project1 = new ProjectFixtureBuilder()
                 .id(1L)
                 .build();
@@ -86,10 +83,8 @@ class ProjectServiceTest {
         ProjectSummaryResponse projectSummaryResponse1 = ProjectSummaryResponse.from(project1);
         ProjectSummaryResponse projectSummaryResponse2 = ProjectSummaryResponse.from(project2);
 
-        // when
-        PagedProjectResponse actual = projectService.getPagedProjects(projectQueryCondition);
+        PagedProjectResponse actual = projectQueryService.getPagedProjects(projectQueryCondition);
 
-        // then
         assertAll(
                 () -> assertThat(actual.contents()).containsExactly(projectSummaryResponse1, projectSummaryResponse2),
                 () -> assertThat(actual.hasNext()).isTrue(),
@@ -98,10 +93,9 @@ class ProjectServiceTest {
         );
     }
 
-    @DisplayName("다음 아티클이 존재하지 않다면 nextCursor 에 공백을 넣고 리턴한다.")
+    @DisplayName("다음 페이지가 없으면 nextCursor 없이 반환한다.")
     @Test
-    void getPagedArticlesWhenHasNoNext() {
-        // given
+    void getPagedProjectsWhenHasNoNext() {
         Project project1 = new ProjectFixtureBuilder()
                 .id(1L)
                 .build();
@@ -131,10 +125,8 @@ class ProjectServiceTest {
         ProjectSummaryResponse projectSummaryResponse2 = ProjectSummaryResponse.from(project2);
         ProjectSummaryResponse projectSummaryResponse3 = ProjectSummaryResponse.from(project3);
 
-        // when
-        PagedProjectResponse actual = projectService.getPagedProjects(projectQueryCondition);
+        PagedProjectResponse actual = projectQueryService.getPagedProjects(projectQueryCondition);
 
-        // then
         assertAll(
                 () -> assertThat(actual.contents()).containsExactly(projectSummaryResponse1, projectSummaryResponse2,
                         projectSummaryResponse3),
@@ -142,5 +134,4 @@ class ProjectServiceTest {
                 () -> assertThat(actual.nextCursor()).isNull()
         );
     }
-
 }
