@@ -20,7 +20,7 @@ public class ProjectQueryConditionFixtureBuilder {
         this.search = new SearchKeyword(null);
         this.categoryNames = new ArrayList<>();
         this.techStackNames = new ArrayList<>();
-        this.projectSortType = null;
+        this.projectSortType = ProjectSortType.CREATED_AT;
         this.limit = 50;
         this.cursor = null;
     }

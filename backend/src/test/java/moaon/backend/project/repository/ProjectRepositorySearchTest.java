@@ -8,21 +8,24 @@ import moaon.backend.fixture.ProjectFixtureBuilder;
 import moaon.backend.fixture.ProjectQueryConditionFixtureBuilder;
 import moaon.backend.fixture.RepositoryHelper;
 import moaon.backend.global.cursor.CursorCodec;
+import moaon.backend.global.config.QueryDslConfig;
 import moaon.backend.project.application.repository.ProjectQueryRepository;
 import moaon.backend.project.application.dto.ProjectQueryCondition;
 import moaon.backend.project.domain.Project;
 import moaon.backend.project.infrastructure.dao.ProjectDao;
 import moaon.backend.project.infrastructure.sort.ProjectSortSpecFactory;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-@Testcontainers
+@Tag("integration")
+@Testcontainers(disabledWithoutDocker = true)
 @SpringBootTest
-@Import({RepositoryHelper.class, ProjectDao.class})
+@Import({RepositoryHelper.class, QueryDslConfig.class, ProjectDao.class})
 public class ProjectRepositorySearchTest {
 
     @Autowired
