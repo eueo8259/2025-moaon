@@ -22,15 +22,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import moaon.backend.global.cursor.Cursor;
+import moaon.backend.global.cursor.CursorToken;
 import moaon.backend.global.domain.SearchKeyword;
 import moaon.backend.project.application.dto.ProjectQueryCondition;
 import moaon.backend.project.domain.Project;
 import moaon.backend.project.domain.ProjectCategory;
-import moaon.backend.project.domain.ProjectSortType;
 import moaon.backend.project.domain.ProjectTechStack;
 import moaon.backend.project.infrastructure.FilteringIds;
 import moaon.backend.project.infrastructure.ProjectFullTextSearchHQLFunction;
+import moaon.backend.project.infrastructure.sort.ProjectSortSpec;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
@@ -66,13 +66,16 @@ public class ProjectDao {
                 .fetch();
     }
 
-    public List<Project> findProjects(ProjectQueryCondition condition, Set<Long> projectIdsByFilter) {
-        Cursor<?> cursor = condition.cursor();
-        ProjectSortType sortBy = condition.projectSortType();
+    public List<Project> findProjects(
+            ProjectQueryCondition condition,
+            Set<Long> projectIdsByFilter,
+            ProjectSortSpec sortSpec,
+            CursorToken cursorToken
+    ) {
         int limit = condition.limit();
 
         int fetchExtraForHasNext = 1;
-        if (sortBy == ProjectSortType.ARTICLE_COUNT) {
+        if (sortSpec.getType() == moaon.backend.project.domain.ProjectSortType.ARTICLE_COUNT) {
             NumberExpression<Long> articleCount = article.id.count();
             List<com.querydsl.core.Tuple> tuples = jpaQueryFactory
                     .select(project, articleCount)
@@ -80,10 +83,10 @@ public class ProjectDao {
                     .leftJoin(article).on(article.project.id.eq(project.id))
                     .where(
                             idsInCondition(projectIdsByFilter),
-                            applyCursor(cursor)
+                            applyCursor(sortSpec, cursorToken)
                     )
                     .groupBy(project.id)
-                    .orderBy(articleCount.desc(), project.id.desc())
+                    .orderBy(sortSpec.getOrderSpecifiers())
                     .limit(limit + fetchExtraForHasNext)
                     .fetch();
 
@@ -100,9 +103,9 @@ public class ProjectDao {
         return jpaQueryFactory.selectFrom(project)
                 .where(
                         idsInCondition(projectIdsByFilter),
-                        applyCursor(cursor)
+                        applyCursor(sortSpec, cursorToken)
                 )
-                .orderBy(toOrderBy(sortBy))
+                .orderBy(sortSpec.getOrderSpecifiers())
                 .limit(limit + fetchExtraForHasNext)
                 .fetch();
     }
@@ -215,26 +218,7 @@ public class ProjectDao {
         return "+" + keyword.toLowerCase() + "*";
     }
 
-    private BooleanExpression applyCursor(Cursor<?> cursor) {
-        if (cursor == null) {
-            return null;
-        }
-        return cursor.getCursorExpression();
-    }
-
-    private OrderSpecifier<?>[] toOrderBy(ProjectSortType sortBy) {
-        if (sortBy == ProjectSortType.CREATED_AT) {
-            return new OrderSpecifier<?>[]{project.createdAt.desc(), project.id.desc()};
-        }
-
-        if (sortBy == ProjectSortType.VIEWS) {
-            return new OrderSpecifier<?>[]{project.views.desc(), project.id.desc()};
-        }
-
-        if (sortBy == ProjectSortType.ARTICLE_COUNT) {
-            return new OrderSpecifier<?>[]{article.id.count().desc(), project.id.desc()};
-        }
-
-        return new OrderSpecifier<?>[]{project.lovedMembers.size().desc(), project.id.desc()};
+    private BooleanExpression applyCursor(ProjectSortSpec sortSpec, CursorToken cursorToken) {
+        return sortSpec.getCursorPredicate(cursorToken);
     }
 }

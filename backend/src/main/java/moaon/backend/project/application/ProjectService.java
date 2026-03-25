@@ -4,7 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import moaon.backend.global.cursor.Cursor;
+import moaon.backend.global.cursor.CursorCodec;
+import moaon.backend.global.cursor.CursorToken;
 import moaon.backend.global.exception.custom.CustomException;
 import moaon.backend.global.exception.custom.ErrorCode;
 import moaon.backend.member.application.MemberService;
@@ -21,6 +22,8 @@ import moaon.backend.project.domain.repository.CategoryRepository;
 import moaon.backend.project.domain.repository.ProjectRepository;
 import moaon.backend.project.domain.ProjectTechStack;
 import moaon.backend.project.infrastructure.TechStackRepository;
+import moaon.backend.project.infrastructure.sort.ProjectSortSpec;
+import moaon.backend.project.infrastructure.sort.ProjectSortSpecFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +38,7 @@ public class ProjectService {
     private final MemberService memberService;
     private final TechStackRepository techStackRepository;
     private final CategoryRepository categoryRepository;
+    private final ProjectSortSpecFactory projectSortSpecFactory;
 
     @Value("${s3.region}")
     private String region;
@@ -50,12 +54,14 @@ public class ProjectService {
     }
 
     public PagedProjectResponse getPagedProjects(ProjectQueryCondition projectQueryCondition) {
-        Projects projects = projectRepository.findWithSearchConditions(projectQueryCondition);
+        CursorToken cursorToken = CursorCodec.decode(projectQueryCondition.cursor());
+        ProjectSortSpec sortSpec = projectSortSpecFactory.get(projectQueryCondition.projectSortType());
+        Projects projects = projectRepository.findWithSearchConditions(projectQueryCondition, sortSpec, cursorToken);
 
         List<Project> projectsToReturn = projects.getProjectsToReturn();
         long count = projects.getCount();
         boolean hasNext = projects.hasNext();
-        Cursor<?> nextCursor = projects.getNextCursor(projectQueryCondition.projectSortType());
+        String nextCursor = projects.getNextCursor(sortSpec);
 
         return PagedProjectResponse.from(projectsToReturn, count, hasNext, nextCursor);
     }

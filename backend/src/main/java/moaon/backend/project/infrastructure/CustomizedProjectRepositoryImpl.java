@@ -3,6 +3,7 @@ package moaon.backend.project.infrastructure;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import moaon.backend.global.cursor.CursorToken;
 import moaon.backend.global.domain.SearchKeyword;
 import moaon.backend.global.exception.custom.CustomException;
 import moaon.backend.global.exception.custom.ErrorCode;
@@ -13,6 +14,7 @@ import moaon.backend.project.domain.Projects;
 import moaon.backend.project.domain.repository.CustomizedProjectRepository;
 import moaon.backend.project.infrastructure.dao.ProjectDao;
 import moaon.backend.project.domain.ProjectTechStack;
+import moaon.backend.project.infrastructure.sort.ProjectSortSpec;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
@@ -23,7 +25,11 @@ public class CustomizedProjectRepositoryImpl implements CustomizedProjectReposit
     private final ProjectDao projectDao;
 
     @Override
-    public Projects findWithSearchConditions(ProjectQueryCondition condition) {
+    public Projects findWithSearchConditions(
+            ProjectQueryCondition condition,
+            ProjectSortSpec sortSpec,
+            CursorToken cursorToken
+    ) {
         int limit = condition.limit();
         List<String> techStackNames = condition.techStackNames();
         SearchKeyword search = condition.search();
@@ -38,7 +44,7 @@ public class CustomizedProjectRepositoryImpl implements CustomizedProjectReposit
             return Projects.empty(limit);
         }
 
-        List<Project> projects = projectDao.findProjects(condition, filteringIds.getIds());
+        List<Project> projects = projectDao.findProjects(condition, filteringIds.getIds(), sortSpec, cursorToken);
         return new Projects(projects, calculateTotalCount(filteringIds), limit);
     }
 

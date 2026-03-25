@@ -6,9 +6,6 @@ import moaon.backend.global.cursor.CursorToken;
 import moaon.backend.project.domain.Project;
 import moaon.backend.project.domain.ProjectSortType;
 
-/**
- * Defines Querydsl sorting and cursor behavior for a single project sort type.
- */
 public interface ProjectSortSpec {
 
     ProjectSortType getType();

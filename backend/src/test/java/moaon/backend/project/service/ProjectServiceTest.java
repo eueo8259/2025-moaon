@@ -4,10 +4,13 @@ package moaon.backend.project.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 
 import java.util.List;
 import moaon.backend.fixture.ProjectFixtureBuilder;
-import moaon.backend.global.cursor.Cursor;
+import moaon.backend.project.infrastructure.sort.ProjectSortSpec;
+import moaon.backend.project.infrastructure.sort.ProjectSortSpecFactory;
 import moaon.backend.global.exception.custom.CustomException;
 import moaon.backend.global.exception.custom.ErrorCode;
 import moaon.backend.project.application.ProjectService;
@@ -32,6 +35,12 @@ class ProjectServiceTest {
 
     @Mock
     private ProjectRepository projectRepository;
+
+    @Mock
+    private ProjectSortSpecFactory projectSortSpecFactory;
+
+    @Mock
+    private ProjectSortSpec projectSortSpec;
 
     @InjectMocks
     private ProjectService projectService;
@@ -69,10 +78,10 @@ class ProjectServiceTest {
                 null
         );
 
-        Mockito.when(projectRepository.findWithSearchConditions(Mockito.any()))
+        Mockito.when(projectSortSpecFactory.get(ProjectSortType.CREATED_AT)).thenReturn(projectSortSpec);
+        Mockito.when(projectRepository.findWithSearchConditions(eq(projectQueryCondition), eq(projectSortSpec), eq(null)))
                 .thenReturn(new Projects(projects, 5, projectQueryCondition.limit()));
-
-        Cursor<?> cursor = projectQueryCondition.projectSortType().toCursor(project2);
+        Mockito.when(projectSortSpec.createNextCursor(project2)).thenReturn("next-cursor");
 
         ProjectSummaryResponse projectSummaryResponse1 = ProjectSummaryResponse.from(project1);
         ProjectSummaryResponse projectSummaryResponse2 = ProjectSummaryResponse.from(project2);
@@ -85,7 +94,7 @@ class ProjectServiceTest {
                 () -> assertThat(actual.contents()).containsExactly(projectSummaryResponse1, projectSummaryResponse2),
                 () -> assertThat(actual.hasNext()).isTrue(),
                 () -> assertThat(actual.totalCount()).isEqualTo(5L),
-                () -> assertThat(actual.nextCursor()).isEqualTo(cursor.getNextCursor())
+                () -> assertThat(actual.nextCursor()).isEqualTo("next-cursor")
         );
     }
 
@@ -114,7 +123,8 @@ class ProjectServiceTest {
                 null
         );
 
-        Mockito.when(projectRepository.findWithSearchConditions(Mockito.any()))
+        Mockito.when(projectSortSpecFactory.get(ProjectSortType.CREATED_AT)).thenReturn(projectSortSpec);
+        Mockito.when(projectRepository.findWithSearchConditions(eq(projectQueryCondition), eq(projectSortSpec), eq(null)))
                 .thenReturn(new Projects(projects, 3, projectQueryCondition.limit()));
 
         ProjectSummaryResponse projectSummaryResponse1 = ProjectSummaryResponse.from(project1);

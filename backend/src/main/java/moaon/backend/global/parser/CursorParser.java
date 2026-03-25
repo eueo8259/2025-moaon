@@ -1,8 +1,6 @@
 package moaon.backend.global.parser;
 
-import java.util.function.BiFunction;
 import moaon.backend.article.domain.ArticleCursor;
-import moaon.backend.global.cursor.Cursor;
 import moaon.backend.global.exception.custom.CustomException;
 import moaon.backend.global.exception.custom.ErrorCode;
 
@@ -26,24 +24,6 @@ public class CursorParser {
         Long lastId = LONG_PARSER.parse(valueAndId[1]);
 
         return new ArticleCursor(sortValue, lastId);
-    }
-
-    public static <T> Cursor<?> toCursor(
-            String cursor,
-            Parser<T> valueParser,
-            BiFunction<T, Long, Cursor<?>> constructor
-    ) {
-
-        if (isCursorEmpty(cursor)) {
-            return null;
-        }
-
-        String[] valueAndId = splitAndValidateFormat(cursor);
-
-        T sortValue = valueParser.parse(valueAndId[0]);
-        Long lastId = LONG_PARSER.parse(valueAndId[1]);
-
-        return constructor.apply(sortValue, lastId);
     }
 
     private static String[] splitAndValidateFormat(String cursor) {

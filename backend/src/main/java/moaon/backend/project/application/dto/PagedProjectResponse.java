@@ -1,7 +1,6 @@
 package moaon.backend.project.application.dto;
 
 import java.util.List;
-import moaon.backend.global.cursor.Cursor;
 import moaon.backend.project.domain.Project;
 
 public record PagedProjectResponse(
@@ -15,13 +14,13 @@ public record PagedProjectResponse(
             List<Project> projectsToReturn,
             Long totalCount,
             boolean hasNext,
-            Cursor<?> nextCursor
+            String nextCursor
     ) {
         return new PagedProjectResponse(
                 ProjectSummaryResponse.from(projectsToReturn),
                 totalCount.intValue(),
                 hasNext,
-                nextCursor == null ? null : nextCursor.getNextCursor()
+                nextCursor
         );
     }
 }
